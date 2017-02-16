@@ -1,0 +1,965 @@
+<style>
+    .form-group-change {
+        position: relative;
+    }
+
+    .form-group-change input {
+        border-radius: 0px !important;
+    }
+
+    .input-text-select {
+        background: #fff !important;
+        border-radius: 0px !important;
+        padding-top: 22px !important;
+    }
+
+    .input-text {
+        padding: 19px 10px 10px 10px;
+        border: 1px solid #ccc;
+        border: none;
+        /*-webkit-box-shadow: inset 0 1px 0 #eee,#fff 0 1px 0;*/
+        /*box-shadow: inset 0 1px 0 #eee,#fff 0 1px 0;*/
+        border-radius: 5px;
+        width: 100%;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .label-helper {
+        position: absolute;
+        top: 0;
+        right: 1px;
+        bottom: 1px;
+        left: .5em;
+        z-index: 1;
+        height: 1em;
+        font-size: 13px;
+        line-height: 1.5em;
+        color: #999;
+        white-space: nowrap;
+        cursor: text;
+        transition: all .1s ease;
+
+    }
+
+    .input-text:focus ~ label, .input-text:valid ~ label {
+        font-size: 9px;
+        font-weight: bold;
+        left: 5px;
+        top: -5px;
+    }
+
+    .input-text:valid ~ label {
+        color: rgb(63, 81, 181);
+    }
+
+    .input-text:focus, .input-text:valid {
+        outline: none;
+        border-bottom: 2px solid rgb(63, 81, 181);
+    }
+
+    .input-text:focus:invalid ~ label {
+        color: red;
+    }
+
+    .input-text:required ~ label::before {
+        content: "*";
+        color: red;
+    }
+
+    .input-text:required {
+        border-bottom: 2px solid red;
+    }
+
+    .input-text:valid {
+        border-bottom: 2px solid rgb(63, 81, 181);
+    }
+
+    .input-text:required:valid ~ label::before {
+        color: rgb(63, 81, 181);
+    }
+
+    .label-helper-change {
+        right: 16px;
+        left: 20px !important;
+    }
+
+    .border-bottom-2-soild {
+        border-bottom: 2px solid #ccc;
+    }
+</style>
+<section class="content-header">
+    <h1>Requests
+        <small>Module description here</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a ui-sref="app.landing"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a ui-sref="app.requests">Request Lists</a></li>
+        <li class="active">Edit Request</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12 col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Edit Request</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row" style="margin-bottom: 30px">
+                        <div class="col-md-12">
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-primary text-right" ng-click="vm.modalOpen('lg')">
+                                    Assign Property
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6" style="margin-bottom: 50px">
+
+                            <form class="form-horizontal" name="requestForm"
+                                  ng-submit="vm.save(requestForm.$valid, requestForm)" novalidate>
+                                <div ng-if="vm.alerts" class="alert alert-{{alert.type}}"
+                                     ng-repeat="alert in vm.alerts">
+                                    <h4>{{alert.title}}</h4>
+                                    <p>{{alert.msg}}</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group"
+                                             ng-class="{ 'has-error': requestForm.requester_name.$invalid && ( vm.formSubmitted || requestForm.requester_name.$touched) }">
+                                            <div class="col-sm-12">
+                                                <input type="text" class="form-control" ng-model="vm.requester_name"
+                                                       name="requester_name"
+                                                       placeholder="Requester Name" required>
+                                                <p ng-show="requestForm.requester_name.$error.required && ( vm.formSubmitted || requestForm.requester_name.$touched)"
+                                                   class="help-block">Requester name is required.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group"
+                                             ng-class="{ 'has-error': requestForm.requester_phone.$invalid && ( vm.formSubmitted || requestForm.requester_phone.$touched) }">
+                                            <div class="col-sm-12">
+                                                <input type="text" class="form-control" ng-model="vm.requester_phone"
+                                                       name="requester_phone"
+                                                       placeholder="Requester Phone" required>
+                                                <p ng-show="requestForm.requester_phone.$error.required && ( vm.formSubmitted || requestForm.requester_phone.$touched)"
+                                                   class="help-block">Requester phone is required.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group"
+                                             ng-class="{ 'has-error': requestForm.requester_fax.$invalid && ( vm.formSubmitted || requestForm.requester_fax.$touched) }">
+                                            <div class="col-sm-12">
+                                                <input type="text" class="form-control" ng-model="vm.requester_fax"
+                                                       name="requester_fax" placeholder="Request Fax">
+                                                <p ng-show="requestForm.requester_fax.$error.required && ( vm.formSubmitted || requestForm.requester_fax.$touched)"
+                                                   class="help-block">Request name is required.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group"
+                                             ng-class="{ 'has-error': requestForm.scope.$invalid && ( vm.formSubmitted || requestForm.scope.$touched) }">
+                                            <div class="col-sm-12">
+                                                <input type="text" class="form-control" ng-model="vm.scope" name="scope"
+                                                       placeholder="Scope" required>
+                                                <p ng-show="requestForm.scope.$error.required && ( vm.formSubmitted || requestForm.scope.$touched)"
+                                                   class="help-block">Scope is required.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <div class="col-sm-12">
+                                                <textarea rows="5" ng-model="vm.details" class="form-control"
+                                                          placeholder="Details">Details</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-4">
+                                        <div class="form-group"
+                                             ng-class="{ 'has-error': requestForm.source_id.$invalid && ( vm.formSubmitted || requestForm.source_id.$touched) }">
+                                            <div class="col-md-12">
+                                                <select class="form-control" name="source_id" required
+                                                        ng-model="vm.source_id">
+                                                    <option value="">Select Source</option>
+                                                    <option value="{{source.id}}"
+                                                            ng-repeat="source in vm.systemSources">{{source.name}}
+                                                    </option>
+                                                </select>
+                                                <p ng-show="requestForm.source_id.$error.required && ( vm.formSubmitted || requestForm.source_id.$touched)"
+                                                   class="help-block">Source is required.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
+                                        <div class="form-group"
+                                             ng-class="{ 'has-error': requestForm.bid_statuses_id.$invalid && ( vm.formSubmitted || requestForm.bid_statuses_id.$touched) }">
+                                            <div class="col-md-12">
+                                                <select class="form-control" name="bid_statuses_id" required
+                                                        ng-model="vm.bid_statuses_id">
+                                                    <option value="">Select Status</option>
+                                                    <option value="{{bidstatus.id}}"
+                                                            ng-repeat="bidstatus in vm.systemBidStatus">
+                                                        {{bidstatus.name}}
+                                                    </option>
+                                                </select>
+                                                <p ng-show="requestForm.bid_statuses_id.$error.required && ( vm.formSubmitted || requestForm.bid_statuses_id.$touched)"
+                                                   class="help-block">Bid status is required.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
+                                        <div class="form-group"
+                                             ng-class="{ 'has-error': requestForm.estimator_id.$invalid && ( vm.formSubmitted || requestForm.estimator_id.$touched) }">
+                                            <div class="col-md-12">
+                                                <select class="form-control" name="estimator_id" required
+                                                        ng-model="vm.estimator_id">
+                                                    <option value="">Select Estimator</option>
+                                                    <option value="{{estimator.id}}"
+                                                            ng-repeat="estimator in vm.systemEstimators">
+                                                        {{estimator.name}}
+                                                    </option>
+                                                </select>
+                                                <p ng-show="requestForm.estimator_id.$error.required && ( vm.formSubmitted || requestForm.estimator_id.$touched)"
+                                                   class="help-block">Estimator is required.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <a ui-sref="app.requests" class="btn  btn-danger">Cancel</a>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="row" style="margin-bottom: 30px; margin-top:30px">
+                                <div class="col-md-12">
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col-md-6 col-sm-6">
+                                            <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Comments</span>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 text-right">
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickRequestAddComment()">Add Comment</a>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickRequestEditComment()">Edit Comment</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" style="margin-bottom: 20px"  ng-show="request_comment_form_show">
+                                    <form name="requestCommentAddForm" ng-submit="vm.requestCommentSave(requestCommentAddForm.$valid, requestCommentAddForm)" novalidate>
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': requestCommentAddForm.comment.$invalid && ( mvm.formSubmitted || requestCommentAddForm.comment.$touched) }">
+                                            <textarea class="input-text input-text-select" required="required" id="request_comment" rows="5" name="comment" cols="50" ng-model="vm.comment.comment"></textarea>
+                                            <label for="request_comment" class="label-helper">Comment</label>
+                                            <p ng-show="requestCommentAddForm.comment.$error.required && ( mvm.formSubmitted || requestCommentAddForm.comment.$touched)" class="help-block">Comment is required.</p>
+                                        </div>
+                                        <div class="form-group text-right">
+                                            <button class="btn btn-default" type="submit">Comment Save/Edit</button>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickRequestCommentCancel()">Cancel</a>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-12">
+                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable10" dt-options="vm.dtOptions10" dt-columns="vm.dtColumns10"></table>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12 col-xs-12 content-tab" style="margin-bottom: 50px">
+                            <div class="form-group form-group-change">
+                                <input class="input-text" required="required" id="property_name" name="property_name" type="text" ng-model="property_name">
+                                <label for="property_name" class="label-helper">Property Name</label>
+                            </div>
+                            <div class="form-group form-group-change">
+                                <input class="input-text" id="property_street" name="property_street" type="text" ng-model="property_street">
+                                <label for="property_street" class="label-helper">Street Address</label>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                        <input class="input-text" id="property_city" name="property_city" type="text" ng-model="property_city">
+                                        <label for="property_city" class="label-helper label-helper-change">City</label>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                        <input class="input-text" id="property_state" name="property_state" type="text" ng-model="property_state">
+                                        <label for="property_state" class="label-helper label-helper-change">State</label>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                        <input class="input-text" id="property_zip" name="property_zip" type="text" ng-model="property_zip">
+                                        <label for="property_zip" class="label-helper label-helper-change">Zip</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                        <input class="input-text" id="property_phone" name="property_phone" type="text" ng-model="property_phone">
+                                        <label for="property_phone" class="label-helper label-helper-change">Property Phone</label>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                        <input class="input-text" id="property_fax" name="property_fax" type="text" ng-model="property_fax">
+                                        <label for="property_fax" class="label-helper label-helper-change">Property Fax</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-change">
+                                <input class="input-text"  id="contact" name="contact" type="text" ng-model="contact">
+                                <label for="contact" class="label-helper">Contact</label>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                        <input class="input-text" id="contact_phone" name="contact_phone" type="text" ng-model="contact_phone">
+                                        <label for="contact_phone" class="label-helper label-helper-change">Contact Phone</label>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                        <input class="input-text" id="contact_fax" name="contact_fax" type="text" ng-model="contact_fax">
+                                        <label for="contact_fax" class="label-helper label-helper-change">Contact Fax</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-change">
+                                <input class="input-text"  id="assign_property_management_company" name="management_company" type="text" ng-model="management_company">
+                                <label for="assign_property_management_company" class="label-helper">Management Company</label>
+                            </div>
+                            <div class="form-group form-group-change">
+                                <input class="input-text" id="assign_property_management_company_street" name="management_company_street" type="text" ng-model="management_company_street">
+                                <label for="assign_property_management_company_street" class="label-helper">Street Address</label>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                        <input class="input-text" id="assign_property_management_company_city" name="management_company_city" type="text" ng-model="management_company_city">
+                                        <label for="assign_property_management_company_city" class="label-helper label-helper-change">City</label>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                        <input class="input-text" id="assign_property_management_company_state" name="management_company_state" type="text" ng-model="management_company_state">
+                                        <label for="assign_property_management_company_state" class="label-helper label-helper-change">State</label>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                        <input class="input-text" id="assign_property_management_company_zip" name="management_company_zip" type="text" ng-model="management_company_zip">
+                                        <label for="assign_property_management_company_zip" class="label-helper label-helper-change">Zip</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                        <input class="input-text" id="management_company_phone" name="management_company_phone" type="text"  ng-model="management_company_phone">
+                                        <label for="management_company_phone" class="label-helper label-helper-change">Management Phone</label>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                        <input class="input-text" id="management_company_fax" name="management_company_fax" type="text" ng-model="management_company_fax">
+                                        <label for="management_company_fax" class="label-helper label-helper-change">Management Fax</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 30px; margin-bottom:30px">
+                                <div class="col-md-12" style="margin-bottom: 30px">
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6">
+                                            <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Request-Related Files</span>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 col-xs-12 text-right margin-bottom-20">
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickRequestAddFile()">Add File</a>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickRequestEditFile()">Edit File</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <!-- form insert -->
+                                </div>
+                                <div class="col-md-12">
+                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable11" dt-options="vm.dtOptions11" dt-columns="vm.dtColumns11"></table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Assign Property</h3>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <form name="assignPropertySearchForm" ng-show="search_property_form"
+                      ng-submit="mvm.searchProperty(assignPropertySearchForm.$valid, assignPropertySearchForm)"
+                      novalidate>
+                    <div class="form-group">
+                        <input type="text" class="form-control" ng-model="mvm.search.property_name" name="property_name"
+                               placeholder="Property Name">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" ng-model="mvm.search.property_street"
+                               name="property_street" placeholder="Address">
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" ng-model="mvm.search.property_city"
+                                           name="property_city" placeholder="City">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" ng-model="mvm.search.property_state"
+                                           name="property_state" placeholder="State">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                        <a href="javascript:void(0)" class="btn btn-primary" ng-click="onAssignPropertyAddNew()">Add
+                            New</a>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-12" style="margin-top: 30px" ng-show="search_property_form">
+                <div class="row">
+                    <div class="col-md-12" style="margin-bottom: 20px">
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-4" style="margin-bottom: 20px">
+                                <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Properties</span>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-8" style="margin-bottom: 20px">
+                                <a href="javascript:void(0)" class="btn btn-default" ng-click="onAssignSelectedProperty()">Assign Selected Property</a>
+                                <a href="javascript:void(0)" class="btn btn-default" ng-click="onAssignPropertyEdit()">Edit Property</a>
+                            </div>
+                            <div class="col-md-4 col-sm-4 text-right">
+                                <a href="javascript:void(0)" class="btn btn-default" ng-click="onShowPropertyDetails()">Show Property Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="mvm.displayTable6" dt-options="mvm.dtOptions6" dt-columns="mvm.dtColumns6"></table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <form name="assignPropertyAddForm"
+                      ng-submit="mvm.propertySave(assignPropertyAddForm.$valid, assignPropertyAddForm)" novalidate
+                      ng-show="new_property_form">
+                    <!-- add first line -->
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group form-group-change"
+                                     ng-class="{ 'has-error': assignPropertyAddForm.property_name.$invalid && ( mvm.formSubmitted || assignPropertyAddForm.property_name.$touched) }">
+                                    <input id="new_property_name" type="text" ng-model="mvm.new.property.property_name"
+                                           class="input-text" name="property_name" required>
+                                    <label for="new_property_name" class="label-helper">Property Name</label>
+                                    <p ng-show="assignPropertyAddForm.property_name.$error.required && ( mvm.formSubmitted || assignPropertyAddForm.property_name.$touched)"
+                                       class="help-block">Property name is required.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group form-group-change"
+                                     ng-class="{ 'has-error': assignPropertyAddForm.property_type.$invalid && ( mvm.formSubmitted || assignPropertyAddForm.property_type.$touched) }">
+                                    <select class="input-text input-text-select" name="property_type" required
+                                            ng-model="mvm.new.property.property_type" id="new_property_type">
+                                        <option value="">Select Property Type</option>
+                                        <option value="{{proprtytype.id}}"
+                                                ng-repeat="proprtytype in mvm.systemPropertyType">{{proprtytype.name}}
+                                        </option>
+                                    </select>
+                                    <label for="new_property_type" class="label-helper">Property Type</label>
+                                    <p ng-show="assignPropertyAddForm.property_type.$error.required && ( mvm.formSubmitted || assignPropertyAddForm.property_type.$touched)"
+                                       class="help-block">Property type is required.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- add second line -->
+                    <div class="form-group form-group-change">
+                        <input type="text" name="property_street" class="input-text" ng-model="mvm.new.property.property_street"
+                               id="new_property_street">
+                        <label for="new_property_street" class="label-helper">Street Address</label>
+                    </div>
+                    <!-- add third line -->
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group form-group-change">
+                                    <input type="text" name="property_city" class="input-text"
+                                           ng-model="mvm.new.property.property_city" id="new_property_city">
+                                    <label for="new_property_city" class="label-helper">City</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="form-group form-group-change">
+                                    <input type="text" name="property_state" class="input-text"
+                                           ng-model="mvm.new.property.property_state" id="new_property_state">
+                                    <label for="new_property_state" class="label-helper">State</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="form-group form-group-change">
+                                    <input type="text" name="property_zip" class="input-text"
+                                           ng-model="mvm.new.property.property_zip" id="new_property_zip">
+                                    <label for="new_property_zip" class="label-helper">Zip</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- add forth line -->
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group form-group-change">
+                                    <input type="text" name="property_country" class="input-text"
+                                           ng-model="mvm.new.property.property_country" id="new_property_phone">
+                                    <label for="new_property_phone" class="label-helper">Country</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group form-group-change"
+                                     ng-class="{ 'has-error': assignPropertyAddForm.mail_to_type_id.$invalid && ( mvm.formSubmitted || assignPropertyAddForm.mail_to_type_id.$touched) }">
+                                    <select class="input-text input-text-select" name="mail_to_type_id" required
+                                            ng-model="mvm.new.property.mail_to_type_id" id="new_property_mail_to_type_id">
+                                        <option value="">Select Mail To Type</option>
+                                        <option value="{{mailtotype.id}}"
+                                                ng-repeat="mailtotype in mvm.systemMailToTypes">{{mailtotype.name}}
+                                        </option>
+                                    </select>
+                                    <label for="new_property_mail_to_type_id" class="label-helper">Mail To Type</label>
+                                    <p ng-show="assignPropertyAddForm.mail_to_type_id.$error.required && ( mvm.formSubmitted || assignPropertyAddForm.mail_to_type_id.$touched)"
+                                       class="help-block">Mail to type is required.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- add  last line -->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" ng-click="onSaveNewProperty()"
+                                ng-show="new_property_save">Save
+                        </button>
+                        <a href="javascript:void(0)" class="btn btn-danger" ng-click="onCancelNewProperty()"
+                           ng-show="new_property_save">Cancel</a>
+                    </div>
+                </form>
+            </div>
+            <input type="hidden" name="property_id" ng-model ="mvm.property_id" >
+            <!-- Add/Edit Phone Form --->
+            <div class="col-md-12" style="margin-top:20px; margin-bottom: 20px;" ng-show="propery_add_edit_show_form">
+                <div class="row" style="margin-bottom: 20px;">
+                    <div class="col-md-6 col-sm-6">
+                        <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Property Phone Numbers</span>
+                    </div>
+                    <div class="col-md-6 col-sm-6 text-right">
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickAddPhone()">Add Phone</a>
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickEditPhone()">Edit
+                            Phone</a>
+                    </div>
+                </div>
+                <div class="col-md-12" style="margin-bottom: 20px"  ng-show="property_phone_form_show">
+                    <form name="propertyPhoneAddForm" ng-submit="mvm.propertyPhoneSave(propertyPhoneAddForm.$valid, propertyPhoneAddForm)" novalidate>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group form-group-change"
+                                         ng-class="{ 'has-error': propertyPhoneAddForm.phone_type_id.$invalid && ( mvm.formSubmitted || propertyPhoneAddForm.phone_type_id.$touched) }">
+                                        <select class="input-text input-text-select" name="phone_type_id" required ng-model="mvm.new.phone.phone_type_id" id="phone_type_id">
+                                            <option value="">Select Phone Type</option>
+                                            <option value="{{phonetype.id}}" ng-repeat="phonetype in mvm.systemPhoneTypes" ng-selected="phonetype.id == mvm.new.phone.phone_type_id">{{phonetype.name}}</option>
+                                        </select>
+                                        <label for="phone_type_id" class="label-helper">Phone Type</label>
+                                        <p ng-show="propertyPhoneAddForm.phone_type_id.$error.required && ( mvm.formSubmitted || propertyPhoneAddForm.phone_type_id.$touched)" class="help-block">Phone type is required.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group form-group-change" ng-class="{ 'has-error': propertyPhoneAddForm.area_code.$invalid && ( mvm.formSubmitted || propertyPhoneAddForm.area_code.$touched) }">
+                                        <input id="area_code" type="text" ng-model="mvm.new.phone.area_code"
+                                               class="input-text" name="area_code" required>
+                                        <label for="area_code" class="label-helper">Area Code</label>
+                                        <p ng-show="propertyPhoneAddForm.area_code.$error.required && ( mvm.formSubmitted || propertyPhoneAddForm.area_code.$touched)"
+                                           class="help-block">Property name is required.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group form-group-change" ng-class="{ 'has-error': propertyPhoneAddForm.phone_number.$invalid && ( mvm.formSubmitted || propertyPhoneAddForm.phone_number.$touched) }">
+                                        <input id="phone_number" type="text" ng-model="mvm.new.phone.phone_number" class="input-text" name="phone_number" required>
+                                        <label for="phone_number" class="label-helper">Phone Number</label>
+                                        <p ng-show="propertyPhoneAddForm.phone_number.$error.required && ( mvm.formSubmitted || propertyPhoneAddForm.phone_number.$touched)" class="help-block">Phone number is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group form-group-change" ng-class="{ 'has-error': propertyPhoneAddForm.phone_ext.$invalid && ( mvm.formSubmitted || propertyPhoneAddForm.phone_ext.$touched) }">
+                                        <input id="phone_ext" type="text" ng-model="mvm.new.phone.phone_ext" class="input-text" name="phone_ext" required>
+                                        <label for="phone_ext" class="label-helper">Phone Ext</label>
+                                        <p ng-show="propertyPhoneAddForm.phone_ext.$error.required && ( mvm.formSubmitted || propertyPhoneAddForm.phone_ext.$touched)" class="help-block">Phone ext is required.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group text-right">
+                            <button class="btn btn-default" type="submit">Phone Number Save/Edit</button>
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPhoneNumberCancel()">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-12" ng-show="propery_add_edit_show_form">
+                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="mvm.displayTable" dt-options="mvm.dtOptions" dt-columns="mvm.dtColumns"></table>
+                </div>
+            </div>
+
+            <!-- Add/Edit Contact Form --->
+            <div class="col-md-12" style="margin-top:20px; margin-bottom: 20px;" ng-show="propery_add_edit_show_form">
+                <div class="row" style="margin-bottom: 20px;">
+                    <div class="col-md-6 col-sm-6">
+                        <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Property Contacts</span>
+                    </div>
+                    <div class="col-md-6 col-sm-6 text-right">
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyAddContact()">Add Contact</a>
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyEditContact()">Edit Contact</a>
+                    </div>
+                </div>
+                <div class="col-md-12" style="margin-bottom: 20px"  ng-show="property_contact_form_show">
+                    <form name="propertyContactAddForm" ng-submit="mvm.propertyContactSave(propertyContactAddForm.$valid, propertyContactAddForm)" novalidate>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group form-group-change"
+                                         ng-class="{ 'has-error': propertyContactAddForm.contact_type_id.$invalid && ( mvm.formSubmitted || propertyContactAddForm.contact_type_id.$touched) }">
+                                        <select class="input-text input-text-select" name="contact_type_id" required ng-model="mvm.new.contact.contact_type_id" id="contact_type_id">
+                                            <option value="">Select Contact Type</option>
+                                            <option value="{{contacttype.id}}" ng-repeat="contacttype in mvm.systemContactTypes" ng-selected="contacttype.id == mvm.new.contact.contact_type_id">{{contacttype.name}}</option>
+                                        </select>
+                                        <label for="contact_type_id" class="label-helper">Contact Type</label>
+                                        <p ng-show="propertyContactAddForm.contact_type_id.$error.required && ( mvm.formSubmitted || propertyContactAddForm.contact_type_id.$touched)" class="help-block">Contact type is required.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group form-group-change" ng-class="{ 'has-error': propertyContactAddForm.area_code.$invalid && ( mvm.formSubmitted || propertyContactAddForm.area_code.$touched) }">
+                                        <input id="contact_first_name" type="text" ng-model="mvm.new.contact.first_name"
+                                               class="input-text" name="area_code" required>
+                                        <label for="contact_first_name" class="label-helper">First Name</label>
+                                        <p ng-show="propertyContactAddForm.first_name.$error.required && ( mvm.formSubmitted || propertyContactAddForm.first_name.$touched)"
+                                           class="help-block">First name is required.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group form-group-change" ng-class="{ 'has-error': propertyContactAddForm.last_name.$invalid && ( mvm.formSubmitted || propertyContactAddForm.last_name.$touched) }">
+                                        <input id="contact_last_name" type="text" ng-model="mvm.new.contact.last_name" class="input-text" name="last_name" required>
+                                        <label for="contact_last_name" class="label-helper">Last Name</label>
+                                        <p ng-show="propertyContactAddForm.last_name.$error.required && ( mvm.formSubmitted || propertyContactAddForm.last_name.$touched)" class="help-block">Last name is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group form-group-change" ng-class="{ 'has-error': propertyContactAddForm.email.$invalid && ( mvm.formSubmitted || propertyContactAddForm.email.$touched) }">
+                                        <input id="contact_email" type="email" ng-model="mvm.new.contact.email" class="input-text" name="email"  ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/" required>
+                                        <label for="contact_email" class="label-helper">Email</label>
+                                        <p ng-show="propertyContactAddForm.$invalid && (mvm.formSubmitted || mvm.errors.email)" class="help-block">{{mvm.errors.email}}</p>
+                                        <p ng-show="propertyContactAddForm.email.$error.required && ( mvm.formSubmitted || propertyContactAddForm.email.$touched)" class="help-block">Email is required.</p>
+                                        <p ng-show="propertyContactAddForm.email.$error.email && propertyContactAddForm.email.$touched" class="help-block">This is not a valid email.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group text-right">
+                            <button class="btn btn-default" type="submit">Contact Save/Edit</button>
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyContactCancel()">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-12" ng-show="propery_add_edit_show_form">
+                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="mvm.displayTable1" dt-options="mvm.dtOptions1" dt-columns="mvm.dtColumns1"></table>
+                </div>
+            </div>
+            <!-- Add/Edit Comment Form --->
+            <div class="col-md-12" style="margin-top:20px; margin-bottom: 20px;" ng-show="propery_add_edit_show_form">
+                <div class="row" style="margin-bottom: 20px;">
+                    <div class="col-md-6 col-sm-6">
+                        <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Property Comments</span>
+                    </div>
+                    <div class="col-md-6 col-sm-6 text-right">
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyAddComment()">Add Comment</a>
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyEditComment()">Edit Comment</a>
+                    </div>
+                </div>
+                <div class="col-md-12" style="margin-bottom: 20px"  ng-show="property_comment_form_show">
+                    <form name="propertyCommentAddForm" ng-submit="mvm.propertyCommentSave(propertyCommentAddForm.$valid, propertyCommentAddForm)" novalidate>
+                        <div class="form-group form-group-change" ng-class="{ 'has-error': propertyCommentAddForm.comment.$invalid && ( mvm.formSubmitted || propertyCommentAddForm.comment.$touched) }">
+                            <textarea class="input-text input-text-select" required="required" id="property_comment" rows="5" name="comment" cols="50" ng-model="mvm.new.comment.comment"></textarea>
+                            <label for="property_comment" class="label-helper">Comment</label>
+                            <p ng-show="propertyCommentAddForm.comment.$error.required && ( mvm.formSubmitted || propertyCommentAddForm.comment.$touched)" class="help-block">Comment is required.</p>
+                        </div>
+                        <div class="form-group text-right">
+                            <button class="btn btn-default" type="submit">Comment Save/Edit</button>
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyCommentCancel()">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-12" ng-show="propery_add_edit_show_form">
+                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="mvm.displayTable2" dt-options="mvm.dtOptions2" dt-columns="mvm.dtColumns2"></table>
+                </div>
+            </div>
+            <!-- Add/Edit Management Form --->
+            <div class="col-md-12" style="margin-top:20px; margin-bottom: 20px;" ng-show="propery_add_edit_show_form">
+                <div class="row" style="margin-bottom: 20px">
+                    <div class="col-md-12">
+                        <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Property Management Companies</span>
+                    </div>
+                    <div class="col-md-12 text-right">
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyAssignManagementCompany()">Assign Management Company</a>
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyAddManagementCompany()">Add Management Company</a>
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyEditManagementCompany()">Edit Management Company</a>
+                    </div>
+                </div>
+                <div class="col-md-12" style="margin-bottom: 20px"  ng-show="property_management_company_form_show">
+                    <form name="propertyCompanyManagementAddForm" ng-submit="mvm.propertyCompanySave(propertyCompanyManagementAddForm.$valid, propertyCompanyManagementAddForm)" novalidate>
+                        <div class="form-group form-group-change" ng-class="{ 'has-error': propertyCompanyManagementAddForm.management_company.$invalid && ( mvm.formSubmitted || propertyCompanyManagementAddForm.management_company.$touched) }">
+                            <input class="input-text" required="required" id="management_company" name="management_company" type="text" ng-model="mvm.new.management.management_company">
+                            <label for="management_company" class="label-helper">Management Company</label>
+                            <p ng-show="propertyCompanyManagementAddForm.management_company.$error.required && ( mvm.formSubmitted || propertyCompanyManagementAddForm.management_company.$touched)"
+                               class="help-block">Management company is required.
+                            </p>
+                        </div>
+                        <div class="form-group form-group-change">
+                            <input class="input-text" id="management_company_street" name="management_company_street" type="text" ng-model="mvm.new.management.management_company_street">
+                            <label for="management_company_street" class="label-helper">Street Address</label>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                    <input class="input-text" id="management_company_city" name="management_company_city" type="text" ng-model="mvm.new.management.management_company_city">
+                                    <label for="management_company_city" class="label-helper label-helper-change">City</label>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                    <input class="input-text" id="management_company_state" name="management_company_state" type="text" ng-model="mvm.new.management.management_company_state">
+                                    <label for="management_company_state" class="label-helper label-helper-change">State</label>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                    <input class="input-text" id="management_company_zip" name="management_company_zip" type="text" ng-model="mvm.new.management.management_company_zip">
+                                    <label for="management_company_zip" class="label-helper label-helper-change">Zip</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group text-right">
+                            <button type="submit" class="btn btn-default">Company Save/Edit</button>
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyCompanyCancel()">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-12" ng-show="propery_add_edit_show_form">
+                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="mvm.displayTable3" dt-options="mvm.dtOptions3" dt-columns="mvm.dtColumns3"></table>
+                </div>
+                <div class="col-md-12" ng-show="assign_company" style="margin-top:30px;">
+                    <div class="form-group form-group-change">
+                        <input class="input-text" required="required" id="assign_management_company" name="management_company" type="text" ng-model="mvm.new.assignmanagement.management_company">
+                        <label for="assign_management_company" class="label-helper">Management Company</label>
+                    </div>
+                    <div class="form-group form-group-change">
+                        <input class="input-text" id="assing_management_company_street" name="management_company_street" type="text" ng-model="mvm.new.assignmanagement.management_company_street">
+                        <label for="assing_management_company_street" class="label-helper">Street Address</label>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                <input class="input-text" id="assing_management_company_city" name="management_company_city" type="text" ng-model="mvm.new.assignmanagement.management_company_city">
+                                <label for="assing_management_company_city" class="label-helper label-helper-change">City</label>
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                <input class="input-text" id="assing_management_company_state" name="management_company_state" type="text" ng-model="mvm.new.assignmanagement.management_company_state">
+                                <label for="assing_management_company_state" class="label-helper label-helper-change">State</label>
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                <input class="input-text" id="assing_management_company_zip" name="management_company_zip" type="text" ng-model="mvm.new.assignmanagement.management_company_zip">
+                                <label for="assing_management_company_zip" class="label-helper label-helper-change">Zip</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assign Company phone  Add / Edit-->
+                <div class="col-md-12" style="margin-top:20px; margin-bottom: 20px;" ng-show="assign_company">
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-6 col-sm-6">
+                            <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Management Company  Phone Numbers</span>
+                        </div>
+                        <div class="col-md-6 col-sm-6 text-right">
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickAddCompanyPhone()">Add Phone</a>
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickEditCompanyPhone()">Edit
+                                Phone</a>
+                        </div>
+                    </div>
+                    <div class="col-md-12" style="margin-bottom: 20px"  ng-show="property_company_phone_form_show">
+                        <form name="propertyCompanyPhoneAddForm" ng-submit="mvm.propertyCompanyPhoneSave(propertyCompanyPhoneAddForm.$valid, propertyCompanyPhoneAddForm)" novalidate>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group form-group-change"
+                                             ng-class="{ 'has-error': propertyCompanyPhoneAddForm.phone_type_id.$invalid && ( mvm.formSubmitted || propertyCompanyPhoneAddForm.phone_type_id.$touched) }">
+                                            <select class="input-text input-text-select" name="phone_type_id" required ng-model="mvm.new.companyphone.phone_type_id" id="assign_phone_type_id">
+                                                <option value="">Select Phone Type</option>
+                                                <option value="{{phonetype.id}}" ng-repeat="phonetype in mvm.systemPhoneTypes" ng-selected="phonetype.id == mvm.new.companyphone.phone_type_id">{{phonetype.name}}</option>
+                                            </select>
+                                            <label for="assign_phone_type_id" class="label-helper">Phone Type</label>
+                                            <p ng-show="propertyCompanyPhoneAddForm.phone_type_id.$error.required && ( mvm.formSubmitted || propertyCompanyPhoneAddForm.phone_type_id.$touched)" class="help-block">Phone type is required.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': propertyCompanyPhoneAddForm.area_code.$invalid && ( mvm.formSubmitted || propertyCompanyPhoneAddForm.area_code.$touched) }">
+                                            <input id="assign_area_code" type="text" ng-model="mvm.new.companyphone.area_code"
+                                                   class="input-text" name="area_code" required>
+                                            <label for="assign_area_code" class="label-helper">Area Code</label>
+                                            <p ng-show="propertyCompanyPhoneAddForm.area_code.$error.required && ( mvm.formSubmitted || propertyCompanyPhoneAddForm.area_code.$touched)"
+                                               class="help-block">Property name is required.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': propertyCompanyPhoneAddForm.phone_number.$invalid && ( mvm.formSubmitted || propertyCompanyPhoneAddForm.phone_number.$touched) }">
+                                            <input id="assign_phone_number" type="text" ng-model="mvm.new.companyphone.phone_number" class="input-text" name="phone_number" required>
+                                            <label for="assign_phone_number" class="label-helper">Phone Number</label>
+                                            <p ng-show="propertyCompanyPhoneAddForm.phone_number.$error.required && ( mvm.formSubmitted || propertyCompanyPhoneAddForm.phone_number.$touched)" class="help-block">Phone number is required.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': propertyCompanyPhoneAddForm.phone_ext.$invalid && ( mvm.formSubmitted || propertyCompanyPhoneAddForm.phone_ext.$touched) }">
+                                            <input id="assign_phone_ext" type="text" ng-model="mvm.new.companyphone.phone_ext" class="input-text" name="phone_ext" required>
+                                            <label for="assign_phone_ext" class="label-helper">Phone Ext</label>
+                                            <p ng-show="propertyCompanyPhoneAddForm.phone_ext.$error.required && ( mvm.formSubmitted || propertyCompanyPhoneAddForm.phone_ext.$touched)" class="help-block">Phone ext is required.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group text-right">
+                                <button class="btn btn-default" type="submit">Phone Number Save/Edit</button>
+                                <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickCompanyPhoneNumberCancel()">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-12" ng-show="assign_company">
+                        <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="mvm.displayTable4" dt-options="mvm.dtOptions4" dt-columns="mvm.dtColumns4"></table>
+                    </div>
+                </div>
+
+
+                <!-- Add/Edit Company Contact Form --->
+                <div class="col-md-12" style="margin-top:20px; margin-bottom: 20px;" ng-show="assign_company">
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-6 col-sm-6">
+                            <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Management Company Contacts</span>
+                        </div>
+                        <div class="col-md-6 col-sm-6 text-right">
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyAddCompanyContact()">Add Contact</a>
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyEditCompanyContact()">Edit Contact</a>
+                        </div>
+                    </div>
+                    <div class="col-md-12" style="margin-bottom: 20px"  ng-show="property_company_contact_form_show">
+                        <form name="propertyCompanyContactAddForm" ng-submit="mvm.propertyCompanyContactSave(propertyCompanyContactAddForm.$valid, propertyCompanyContactAddForm)" novalidate>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group form-group-change"
+                                             ng-class="{ 'has-error': propertyCompanyContactAddForm.contact_type_id.$invalid && ( mvm.formSubmitted || propertyCompanyContactAddForm.contact_type_id.$touched) }">
+                                            <select class="input-text input-text-select" name="contact_type_id" required ng-model="mvm.new.companycontact.contact_type_id" id="assign_contact_type_id">
+                                                <option value="">Select Contact Type</option>
+                                                <option value="{{contacttype.id}}" ng-repeat="contacttype in mvm.systemContactTypes" ng-selected="contacttype.id == mvm.new.companycontact.contact_type_id">{{contacttype.name}}</option>
+                                            </select>
+                                            <label for="assign_contact_type_id" class="label-helper">Contact Type</label>
+                                            <p ng-show="propertyCompanyContactAddForm.contact_type_id.$error.required && ( mvm.formSubmitted || propertyCompanyContactAddForm.contact_type_id.$touched)" class="help-block">Contact type is required.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': propertyCompanyContactAddForm.area_code.$invalid && ( mvm.formSubmitted || propertyCompanyContactAddForm.area_code.$touched) }">
+                                            <input id="assign_contact_first_name" type="text" ng-model="mvm.new.companycontact.first_name"
+                                                   class="input-text" name="area_code" required>
+                                            <label for="assign_contact_first_name" class="label-helper">First Name</label>
+                                            <p ng-show="propertyCompanyContactAddForm.first_name.$error.required && ( mvm.formSubmitted || propertyCompanyContactAddForm.first_name.$touched)"
+                                               class="help-block">First name is required.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': propertyCompanyContactAddForm.last_name.$invalid && ( mvm.formSubmitted || propertyCompanyContactAddForm.last_name.$touched) }">
+                                            <input id="assign_contact_last_name" type="text" ng-model="mvm.new.companycontact.last_name" class="input-text" name="last_name" required>
+                                            <label for="assign_contact_last_name" class="label-helper">Last Name</label>
+                                            <p ng-show="propertyCompanyContactAddForm.last_name.$error.required && ( mvm.formSubmitted || propertyCompanyContactAddForm.last_name.$touched)" class="help-block">Last name is required.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': propertyCompanyContactAddForm.email.$invalid && ( mvm.formSubmitted || propertyCompanyContactAddForm.email.$touched) }">
+                                            <input id="assign_contact_email" type="email" ng-model="mvm.new.companycontact.email" class="input-text" name="email"  ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/" required>
+                                            <label for="assign_contact_email" class="label-helper">Email</label>
+                                            <p ng-show="propertyCompanyContactAddForm.$invalid && (mvm.formSubmitted || mvm.errors.email)" class="help-block">{{mvm.errors.email}}</p>
+                                            <p ng-show="propertyCompanyContactAddForm.email.$error.required && ( mvm.formSubmitted || propertyCompanyContactAddForm.email.$touched)" class="help-block">Email is required.</p>
+                                            <p ng-show="propertyCompanyContactAddForm.email.$error.email && propertyCompanyContactAddForm.email.$touched" class="help-block">This is not a valid email.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group text-right">
+                                <button class="btn btn-default" type="submit">Contact Save/Edit</button>
+                                <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyCompanyContactCancel()">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-12" ng-show="assign_company">
+                        <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="mvm.displayTable5" dt-options="mvm.dtOptions5" dt-columns="mvm.dtColumns5"></table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row" ng-hide="new_property_save">
+            <div class="col-md-12">
+                <a href="javascript:void(0)" class="btn btn-danger" ng-click="onCancelNewProperty()">Cancel</a>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" type="button" ng-click="mvm.cancel()">Cancel</button>
+    </div>
+</script>
