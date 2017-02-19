@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRequestFilesTable extends Migration
+class CreateRequestCommentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,17 +12,9 @@ class CreateRequestFilesTable extends Migration
      */
     public function up()
     {
-        Schema::create('request_files', function (Blueprint $table) {
+        Schema::create('request_comments', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('file_type')->nullable();
-
-            $table->string('description')->nullable();
-
-            $table->string('file_name')->nullable();
-
-            $table->string('mime')->nullable();
-
-            $table->string('file_change_name')->nullable();
+            $table->longText('comment')->nullable();
 
             $table->integer('request_id')->unsigned();
 
@@ -47,6 +39,6 @@ class CreateRequestFilesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('request_files');
+        Schema::drop('request_comments');
     }
 }

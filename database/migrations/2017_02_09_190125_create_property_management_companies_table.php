@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateManagementCompaniesTable extends Migration
+class CreatePropertyManagementCompaniesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -19,6 +19,7 @@ class CreateManagementCompaniesTable extends Migration
             $table->string('management_company_city')->nullable();
             $table->string('management_company_state')->nullable();
             $table->string('management_company_zip')->nullable();
+
             $table->timestamps();
         });
     }

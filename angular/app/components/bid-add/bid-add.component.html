@@ -115,208 +115,157 @@
                     <h3 class="box-title">Add Bid</h3>
                 </div>
                 <div class="box-body">
+                    <div class="row margin-bottom-30">
+                        <div class="col-md-12">
+                            <div class="form-group text-right">
+                                <a href="javascript:void(0)" class="btn btn-primary">Create Job</a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
-                        <!-- left side -->
-                        <div class="col-md-6">
-                            <form name="viewBidApproveBidForm"  ng-submit="vm.searchProperty(viewBidApproveBidForm.$valid, viewBidApproveBidForm)"
-                                  novalidate>
+                        <form name="viewBidAddBidForm"  ng-submit="vm.save(viewBidAddBidForm.$valid, viewBidAddBidForm)" novalidate>
+                            <div ng-if="vm.alerts" class="alert alert-{{alert.type}}"
+                                 ng-repeat="alert in vm.alerts">
+                                <h4>{{alert.title}}</h4>
+                                <p>{{alert.msg}}</p>
+                            </div>
+                            <div class="col-md-6 col-sm-6 margin-bottom-20">
                                 <div class="row margin-bottom-40">
-                                    <div class="col-md-4 col-sm-4 col-xs-12">
-                                        <div class="form-group">
-                                            <div class="col-md-12">
-                                                <select class="form-control" name="bid_type_id"  ng-model="vm.view.bid_type_id">
-                                                    <option value="">Select Bid Type</option>
-                                                    <option value="{{bidtype.id}}"
-                                                            ng-repeat="bidtype in vm.systemBidTypes">
-                                                        {{bidtype.name}}
-                                                    </option>
-                                                </select>
-                                            </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="form-group" ng-class="{ 'has-error': viewBidAddBidForm.bid_type_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.bid_type_id.$touched) }">
+                                            <select class="form-control" name="bid_type_id"  ng-model="vm.bid_type_id" ng-change="selectedBidTypeChange()" required>
+                                                <option value="">Select Bid Type</option>
+                                                <option value="{{bidtype.name}}"
+                                                        ng-repeat="bidtype in vm.systemBidTypes">
+                                                    {{bidtype.name}}
+                                                </option>
+                                            </select>
+                                            <p ng-show="viewBidAddBidForm.bid_type_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.bid_type_id.$touched)"
+                                               class="help-block">Bid type is required.
+                                            </p>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
                                         <p class="input-group">
-                                            <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="vm.view.date_of_action" is-open="popup1.opened" datepicker-options="dateOptions"  close-text="Close" alt-input-formats="altInputFormats" placeholder="YYYY-MM-DD"/>
+                                            <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="vm.due_date" is-open="popup1.opened" datepicker-options="dateOptions"  close-text="Close" alt-input-formats="altInputFormats" placeholder="YYYY-MM-DD"/>
                                             <span class="input-group-btn">
                                         <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
                                       </span>
                                         </p>
                                     </div>
-                                    <div class="col-md-5 col-sm-5 col-xs-12">
-                                        <a href="javascript:void(0)" class="btn btn-primary margin-bottom-40">View Bid Form</a>
-                                        <a href="javascript:void(0)" class="btn btn-primary margin-bottom-40">Approve Bid</a>
+                                </div>
+                                <div class="row margin-bottom-40">
+                                    <div class="col-md-6 col-sm-6 col-xs-12" ng-show="bidTemplateNgShow">
+                                        <div class="form-group" ng-class="{ 'has-error': viewBidAddBidForm.bid_template_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.bid_template_id.$touched) }">
+                                            <select class="form-control" name="bid_template_id"  ng-model="vm.bid_template_id"  id="bid_template_id" ng-required="isStandard" >
+                                                <option value="">Select Bid Template</option>
+                                                <option value="{{bidtemplate.id}}"
+                                                        ng-repeat="bidtemplate in vm.systemBidTemplates">
+                                                    {{bidtemplate.name}}
+                                                </option>
+                                            </select>
+                                            <p ng-show="viewBidAddBidForm.bid_template_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.bid_template_id.$touched)"
+                                               class="help-block">Bid template is required.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="form-group">
+                                            <label>Archive Bid </label>
+                                            <input type="checkbox" name="archive_bid" value="1" ng-model="vm.archive_bid" style="margin-left: 10px; margin-top: 10px;">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row margin-bottom-40">
-                                    <div class="col-md-4 col-sm-4 col-xs-12">
-                                        <div class="form-group">
-                                            <div class="col-md-12">
-                                                <select class="form-control" name="bid_template_id"  ng-model="vm.view.bid_template_id">
-                                                    <option value="">Select Bid Template</option>
-                                                    <option value="{{bidtemplate.id}}"
-                                                            ng-repeat="bidtemplate in vm.systemBidTemplates">
-                                                        {{bidtemplate.name}}
-                                                    </option>
-                                                </select>
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <a href="javascript:void(0)" class="btn btn-primary margin-bottom-40">View Bid Form</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary margin-bottom-40">Approve Bid</a>
+                                        <input type="submit" name="archive_bid" value="Save Bid" class="btn btn-primary margin-bottom-40">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 margin-bottom-20">
+                                <div class="row margin-bottom-50">
+
+                                    <div class="col-md-12">
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': viewBidAddBidForm.source_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.source_id.$touched) }">
+                                            <input class="input-text" id="bid_scope" name="scope" type="text" ng-model="vm.scope" required>
+                                            <label for="bid_scope" class="label-helper">Scope</label>
+                                            <p ng-show="viewBidAddBidForm.scope.$error.required && ( vm.formSubmitted || viewBidAddBidForm.scope.$touched)"
+                                               class="help-block">Scope is required.
+                                            </p>
+                                        </div>
+                                        <div class="form-group form-group-change">
+                                            <textarea class="input-text" id="bid_details" name="details" type="text" rows="5" ng-model="vm.details"></textarea>
+                                            <label for="bid_details" class="label-helper">Details</label>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <div class="form-group form-group-change" ng-class="{ 'has-error': viewBidAddBidForm.source_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.source_id.$touched) }">
+                                                    <select class="input-text input-text-select" name="source_id" required  ng-model="vm.source_id" id="bid_source" >
+                                                        <option value="">Select Source</option>
+                                                        <option value="{{source.id}}"
+                                                                ng-repeat="source in vm.systemSources">{{source.name}}
+                                                        </option>
+                                                    </select>
+                                                    <label for="bid_source" class="label-helper">Source</label>
+                                                    <p ng-show="viewBidAddBidForm.source_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.source_id.$touched)"
+                                                       class="help-block">Source is required.
+                                                    </p>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <div class="form-group form-group-change"
+                                                     ng-class="{ 'has-error': viewBidAddBidForm.bid_statuses_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.bid_statuses_id.$touched) }">
+                                                    <div class="col-md-12">
+                                                        <select class="input-text input-text-select" name="bid_statuses_id" required ng-model="vm.bid_statuses_id" id="bid_status">
+                                                            <option value="">Select Status</option>
+                                                            <option value="{{bidstatus.id}}"
+                                                                    ng-repeat="bidstatus in vm.systemBidStatus">
+                                                                {{bidstatus.name}}
+                                                            </option>
+                                                        </select>
+                                                        <label for="bid_status" class="label-helper">Status</label>
+                                                        <p ng-show="viewBidAddBidForm.bid_statuses_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.bid_statuses_id.$touched)"
+                                                           class="help-block">Bid status is required.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-sm-4 col-xs-12 ">
+                                                <div class="form-group form-group-change"  ng-class="{ 'has-error': viewBidAddBidForm.estimator_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.estimator_id.$touched) }">
+                                                    <select class="input-text input-text-select" name="estimator_id" required
+                                                            ng-model="vm.estimator_id" id="bid_estimator">
+                                                        <option value="">Select Estimator</option>
+                                                        <option value="{{estimator.id}}"
+                                                                ng-repeat="estimator in vm.systemEstimators">
+                                                            {{estimator.name}}
+                                                        </option>
+                                                    </select>
+                                                    <label for="bid_estimator" class="label-helper">Estimator</label>
+                                                    <p ng-show="viewBidAddBidForm.estimator_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.estimator_id.$touched)"
+                                                       class="help-block">Estimator is required.
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-sm-3 col-xs-12">
-                                        <span>Archive Bid </span><input type="radio" name="archive_bid" value="1" ng-model="vm.view.archive_bid">
-                                    </div>
-                                </div>
-                            </form>
-                            <div class="row margin-bottom-50">
-                                <div class="col-md-12 text-right">
-                                    <span>Approved By:Full Name Last Name</span> <br>
-                                    <span>Approved Date:Date/Time Stamp</span>
                                 </div>
                             </div>
+                        </form>
+                    </div>
+                    <div class="row">
+                        <!-- left side -->
+                        <div class="col-md-6">
                             <!-- Bid Line Items Start -->
-                            <div class="row  margin-bottom-30">
-                                <div class="col-md-12">
-                                    <div class="row margin-bottom-10">
-                                        <div class="col-md-6 col-sm-6 col-xs-12 margin-bottom-20">
-                                            <span class="font-weight-900" >Bid Line Items</span>
-                                        </div>
-                                        <div class="col-md-6 col-sm-6 col-xs-12 text-right margin-bottom-20">
-                                            <a href="javascript:void(0)" class="btn btn-default"  onclick="onClickBidAddLineItem()">Add Line Item</a>
-                                            <a href="javascript:void(0)" class="btn btn-default"  onclick="onClickBidEditLineItem()">Edit Line Item</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 margin-bottom-30">
-
-                                </div>
-                                <div class="col-md-12 margin-bottom-40">
-                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable10" dt-options="vm.dtOptions10" dt-columns="vm.dtColumns10"></table>
-                                </div>
-                            </div>
-                            <!-- Bid Line Items End -->
-                            <!-- Contacts Start -->
-                            <div class="row  margin-bottom-30">
-                                <div class="col-md-12">
-                                    <div class="row margin-bottom-10">
-                                        <div class="col-md-6 col-sm-6 col-xs-12 margin-bottom-20">
-                                            <span class="font-weight-900" >Contacts</span>
-                                        </div>
-                                        <div class="col-md-6 col-sm-6 col-xs-12 text-right margin-bottom-20">
-                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidAddContact()">Add Contact</a>
-                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidEditContact()">Edit Contact</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 margin-bottom-30">
-
-                                </div>
-                                <div class="col-md-12 margin-bottom-40">
-                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable11" dt-options="vm.dtOptions11" dt-columns="vm.dtColumns11"></table>
-                                </div>
-                            </div>
-                            <!-- Contacts End -->
-                            <!-- Contacts Start -->
-                            <div class="row  margin-bottom-30">
-                                <div class="col-md-12">
-                                    <div class="row margin-bottom-10">
-                                        <div class="col-md-6 col-sm-6 col-xs-12 margin-bottom-20">
-                                            <span class="font-weight-900" >Files</span>
-                                        </div>
-                                        <div class="col-md-6 col-sm-6 col-xs-12 text-right margin-bottom-20">
-                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidAddFile()">Add File</a>
-                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidEditFile()">Edit File</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 margin-bottom-30">
-
-                                </div>
-                                <div class="col-md-12 margin-bottom-40">
-                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable11" dt-options="vm.dtOptions12" dt-columns="vm.dtColumns12"></table>
-                                </div>
-                            </div>
-                            <!-- Contacts End -->
-                            <!-- Comment Start -->
-                            <div class="row margin-bottom-30">
-                                <div class="col-md-12">
-                                    <div class="row" style="margin-bottom: 20px;">
-                                        <div class="col-md-6 col-sm-6">
-                                            <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Comments</span>
-                                        </div>
-                                        <div class="col-md-6 col-sm-6 text-right">
-                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidAddComment()">Add Comment</a>
-                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidEditComment()">Edit Comment</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12" style="margin-bottom: 20px"  ng-show="request_comment_form_show">
-                                    <form name="requestCommentAddForm" ng-submit="vm.requestCommentSave(requestCommentAddForm.$valid, requestCommentAddForm)" novalidate>
-                                        <div class="form-group form-group-change" ng-class="{ 'has-error': requestCommentAddForm.comment.$invalid && ( mvm.formSubmitted || requestCommentAddForm.comment.$touched) }">
-                                            <textarea class="input-text input-text-select" required="required" id="request_comment" rows="5" name="comment" cols="50" ng-model="vm.comment.comment"></textarea>
-                                            <label for="request_comment" class="label-helper">Comment</label>
-                                            <p ng-show="requestCommentAddForm.comment.$error.required && ( mvm.formSubmitted || requestCommentAddForm.comment.$touched)" class="help-block">Comment is required.</p>
-                                        </div>
-                                        <div class="form-group text-right">
-                                            <button class="btn btn-default" type="submit">Comment Save/Edit</button>
-                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidCommentCancel()">Cancel</a>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="col-md-12">
-                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable13" dt-options="vm.dtOptions13" dt-columns="vm.dtColumns13"></table>
-                                </div>
-                            </div>
-                            <!-- Comment End -->
-                            <!-- Notification Start -->
-                            <div class="row margin-bottom-30">
-                                <div class="col-md-12">
-                                    <div class="row" style="margin-bottom: 20px;">
-                                        <div class="col-md-12 col-sm-12">
-                                            <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Notification Log</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable14" dt-options="vm.dtOptions14" dt-columns="vm.dtColumns14"></table>
-                                </div>
-                            </div>
                         </div>
                         <!-- right side -->
                         <div class="col-md-6">
-                            <div class="row margin-bottom-40">
-                                <div class="col-md-12 text-right">
-                                    <a href="javascript:void(0)" class="btn btn-primary">Create Job</a>
-                                </div>
-                            </div>
 
                             <!-- scope section start-->
-                            <div class="row margin-bottom-50">
-                                <div class="col-md-12">
-                                    <div class="form-group form-group-change">
-                                        <input class="input-text" id="bid_scope" name="scope" type="text" ng-model="bid_scope">
-                                        <label for="bid_scope" class="label-helper">Scope</label>
-                                    </div>
-                                    <div class="form-group form-group-change">
-                                        <input class="input-text" id="bid_details" name="details" type="text" ng-model="details">
-                                        <label for="bid_details" class="label-helper">Details</label>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-4 col-sm-4 col-xs-12 form-group-change">
-                                                <input class="input-text" id="bid_source" name="source" type="text" ng-model="scope">
-                                                <label for="bid_source" class="label-helper label-helper-change">Source</label>
-                                            </div>
-                                            <div class="col-md-4 col-sm-4 col-xs-12 form-group-change">
-                                                <input class="input-text" id="bid_status" name="status" type="text" ng-model="status">
-                                                <label for="bid_status" class="label-helper label-helper-change">Status</label>
-                                            </div>
-                                            <div class="col-md-4 col-sm-4 col-xs-12 form-group-change">
-                                                <input class="input-text" id="bid_estimator" name="estimator" type="text" ng-model="estimator">
-                                                <label for="bid_estimator" class="label-helper label-helper-change">Estimator</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
+
                             <!-- scope section end-->
 
 
@@ -517,11 +466,9 @@
                             <div class="col-md-6 col-sm-6">
                                 <div class="form-group form-group-change"
                                      ng-class="{ 'has-error': assignPropertyAddForm.property_type.$invalid && ( mvm.formSubmitted || assignPropertyAddForm.property_type.$touched) }">
-                                    <select class="input-text input-text-select" name="property_type" required
-                                            ng-model="mvm.new.property.property_type" id="new_property_type">
+                                    <select class="input-text input-text-select" name="property_type" required ng-model="mvm.new.property.property_type" id="new_property_type">
                                         <option value="">Select Property Type</option>
-                                        <option value="{{proprtytype.id}}"
-                                                ng-repeat="proprtytype in mvm.systemPropertyType">{{proprtytype.name}}
+                                        <option value="{{proprtytype.id}}" ng-repeat="proprtytype in mvm.systemPropertyType" ng-selected="proprtytype.id == mvm.new.property.property_type">{{proprtytype.name}}
                                         </option>
                                     </select>
                                     <label for="new_property_type" class="label-helper">Property Type</label>
@@ -581,7 +528,7 @@
                                             ng-model="mvm.new.property.mail_to_type_id" id="new_property_mail_to_type_id">
                                         <option value="">Select Mail To Type</option>
                                         <option value="{{mailtotype.id}}"
-                                                ng-repeat="mailtotype in mvm.systemMailToTypes">{{mailtotype.name}}
+                                                ng-repeat="mailtotype in mvm.systemMailToTypes" ng-selected="mailtotype.id == mvm.new.property.mail_to_type_id">{{mailtotype.name}}
                                         </option>
                                     </select>
                                     <label for="new_property_mail_to_type_id" class="label-helper">Mail To Type</label>
@@ -777,7 +724,7 @@
                     </div>
                     <div class="col-md-12 text-right">
                         <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyAssignManagementCompany()">Assign Management Company</a>
-                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyAddManagementCompany()">Add Management Company</a>
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyAddManagementCompany()" ng-show="managementcompanyempty">Add Management Company</a>
                         <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickPropertyEditManagementCompany()">Edit Management Company</a>
                     </div>
                 </div>

@@ -14,16 +14,17 @@ use App\Property_contact;
 
 use App\Property_comment;
 
-use App\Property_management_company;
+use App\Management_company;
 
-use App\Property_management_company_contact;
+use App\Management_company_contact;
 
-use App\Property_management_company_phone;
+use App\Management_company_phone;
 
 use App\Property_phone;
 
 use App\Phone_type;
 
+use App\Phone;
 
 
 use Auth;
@@ -43,9 +44,10 @@ class PropertyController extends Controller
         if($property_id != "") {
             $property = Property::where('id',$property_id)->first();
         }
-        $property_phone_id = $request->input('phone_id');
-        if($property_phone_id != "") {
-            $property_phone = Property_phone::where('id',$property_phone_id)->first();
+        //$property_phone_id = $request->input('phone_id');
+        $property_phones = Property_phone::where('property_id', $property_id)->first();
+        if(count($property_phones) >0) {
+            $property_phone = Phone::where('id',$property_phones->phone_id)->first();
             if($property_phone->phone_type_id  == $phone_fax_type->id){
                 $resultArray['phone'] = "";
                 $resultArray['phone_fax'] = $property_phone->area_code. " " . $property_phone->phone_number ." " . $property_phone->phone_ext;
@@ -58,29 +60,39 @@ class PropertyController extends Controller
             $resultArray['phone'] = "";
             $resultArray['phone_fax'] ="";
         }
-        $property_contact_id = $request->input('contact_id');
-        if($property_contact_id != "") {
-            $property_contact = Property_contact::where('id',$property_contact_id)->first();
+        //$property_contact_id = $request->input('contact_id');
+        $property_contact = Property_contact::where('property_id', $property_id)->first();
+        if(count($property_contact) >0) {
+
+            //$property_contact = Property_contact::where('id',$property_contact_id)->first();
             $resultArray['contact_name'] = $property_contact->first_name." " . $property_contact->last_name;
         }else{
             $resultArray['contact_name'] =  "";
         }
         $property_contact_phone_id = $request->input('contact_phone_id');
         $property_company_id = $request->input('company_id');
-        if($property_company_id != "") {
-            $property_company = Property_management_company::where('id',$property_company_id)->first();
+
+        if($property->management_company_id != 0) {
+            $property_company = Management_company::where('id',$property->management_company_id)->first();
             $resultArray['property_company_list'] = $property_company;
         }else{
             $resultArray['property_company_list'] = "";
         }
         $property_company_phone_id = $request->input('company_phone_id');
-        if($property_company_phone_id != "") {
-            $property_company_phone = Property_management_company_phone::where('id',$property_company_phone_id)->first();
-            if($property_company_phone->phone_type_id  == $phone_fax_type->id){
-                $resultArray['company_phone'] = "";
-                $resultArray['company_phone_fax'] =$property_company_phone->area_code. " " . $property_company_phone->phone_number ." " . $property_company_phone->phone_ext;
+        if($property->management_company_id !=0){
+            $property_company_phones = Management_company_phone::where('management_company_id',$property->management_company_id)->get();
+            if(count($property_company_phones)>0) {
+                $property_company_phone = Management_company_phone::where('management_company_id',$property->management_company_id)->first();
+                $phone = Phone::where('id',$property_company_phone->phone_id)->first();
+                if($phone->phone_type_id  == $phone_fax_type->id){
+                    $resultArray['company_phone'] = "";
+                    $resultArray['company_phone_fax'] =$phone->area_code. " " . $phone->phone_number ." " . $phone->phone_ext;
+                }else{
+                    $resultArray['company_phone'] = $phone->area_code. " " . $phone->phone_number ." " . $phone->phone_ext;
+                    $resultArray['company_phone_fax'] ="";
+                }
             }else{
-                $resultArray['company_phone'] = $property_company_phone->area_code. " " . $property_company_phone->phone_number ." " . $property_company_phone->phone_ext;
+                $resultArray['company_phone'] = "";
                 $resultArray['company_phone_fax'] ="";
             }
         }else{
@@ -88,13 +100,21 @@ class PropertyController extends Controller
             $resultArray['company_phone_fax'] ="";
         }
 
-        $property_company_contact_id = $request->input('company_contact_id');
-        if($property_company_contact_id !="") {
-            $property_company_contact = Property_management_company_contact::where('id',$property_company_phone_id)->first();
-            $resultArray['company_contact_name'] = $property_company_contact->first_name." " . $property_company_contact->last_name;
+
+//        $property_company_contact_id = $request->input('company_contact_id');
+        if($property->management_company_id !=0){
+            $property_company_contacts = Management_company_contact::where('management_company_id', $property->management_company_id)->get();
+            if(count($property_company_contacts)>0) {
+
+                $property_company_contact = Management_company_contact::where('management_company_id',$property->management_company_id)->first();
+                $resultArray['company_contact_name'] = $property_company_contact->first_name." " . $property_company_contact->last_name;
+            }else{
+                $resultArray['company_contact_name'] = "";
+            }
         }else{
             $resultArray['company_contact_name'] = "";
         }
+
         return response()->json(['property' =>$property, 'result' =>$resultArray] );
     }
 
@@ -139,7 +159,12 @@ class PropertyController extends Controller
         $contactArray = $this->getPropertyContactList($contacts);
         $comments = Property_comment::where('property_id' ,$property_id)->get();
         $commentArray = $this->getPropertyCommentList($comments);
-        $companies = Property_management_company::where('property_id' ,$property_id)->get();
+        if($property->management_company_id !=0){
+            $companies = Management_company::where('id' ,$property->management_company_id)->get();
+        }else{
+            $companies = "";
+        }
+
         return response()->json(['response' => $data, 'property' =>$property,'phone' =>$phoneArray,'contact' =>$contactArray, 'comment' =>$commentArray, 'company' =>$companies]);
     }
     public function postProperty(request $request){
@@ -152,7 +177,7 @@ class PropertyController extends Controller
             $data['type'] = 'updated';
         }else{
             $property = Property::create($request->all());
-//            $property_id = 1;
+//            $property_id = 5;
 //            $property = Property::where('id', $property_id)->first();
             $data['result'] = 'success';
             $data['type'] = 'created';
@@ -164,34 +189,45 @@ class PropertyController extends Controller
         $contactArray = $this->getPropertyContactList($contacts);
         $comments = Property_comment::where('property_id' ,$property_id)->get();
         $commentArray = $this->getPropertyCommentList($comments);
-        $companies = Property_management_company::where('property_id' ,$property_id)->get();
+        if($property->management_company_id !=0){
+            $companies = Management_company::where('id' ,$property->management_company_id)->get();
+        }else{
+            $companies = "";
+        }
         return response()->json(['response' => $data, 'property' =>$property,'phone' =>$phoneArray,'contact' =>$contactArray, 'comment' =>$commentArray, 'company' =>$companies]);
     }
     /**** company phone ****/
     public function postPropertycompanyphone(Request $request){
         $property_phone_id = $request->input('property_phone_id');
         if($property_phone_id != ""){
-            $Property_management_company_phone = Property_management_company_phone::where('id', $property_phone_id)->first();
-            $Property_management_company_phone->update($request->all());
+            $Property_management_company_phone = Management_company_phone::where('id', $property_phone_id)->first();
+            $phone = Phone::where('id',$Property_management_company_phone->phone_id)->first();
+            $phone->update($request->all());
             $data['result'] = 'success';
             $data['type'] = 'updated';
         }else{
-            $Property_management_company_phone = Property_management_company_phone::create($request->all());
+            $phone = Phone::create($request->all());
+            $propertyData = array(
+                'phone_id' =>$phone->id,
+                'management_company_id' =>$request->input('management_company_id')
+            );
+            $Property_management_company_phone = Management_company_phone::create($propertyData);
             $data['result'] = 'success';
             $data['type'] = 'created';
         }
         $property_id = $request->input('property_id');
-        $property_company_id = $request->input('property_company_id');
-        $phones = Property_management_company_phone::where('property_id' ,$property_id)->where('property_company_id',$property_company_id)->get();
+        $property_company_id = $request->input('management_company_id');
+        $phones = Management_company_phone::where('management_company_id',$property_company_id)->get();
         $phoneArray = $this->getPropertyPhoneList($phones);
         return response()->json(['response' => $data, 'phone' =>$phoneArray]);
     }
 
     public function postPropertyeditcompanyphonedata(Request $request){
         $property_phone_id = $request->input('property_phone_id');
-        $property_company_phone = Property_management_company_phone::where('id', $property_phone_id)->first();
+        $property_company_phone = Management_company_phone::where('id', $property_phone_id)->first();
+        $phone = Phone::where('id',$property_company_phone->phone_id)->first();
         $data['result'] = 'success';
-        return response()->json(['response' =>$data, 'property_phone' => $property_company_phone]);
+        return response()->json(['response' =>$data, 'property_phone' => $property_company_phone,'phone' =>$phone]);
     }
 
     /**** property phone *****/
@@ -199,31 +235,37 @@ class PropertyController extends Controller
        $property_phone_id = $request->input('property_phone_id');
        if($property_phone_id != ""){
            $property_phone = Property_phone::where('id', $property_phone_id)->first();
-           $property_phone->update($request->all());
+           $phone = Phone::where('id', $property_phone->phone_id)->first();
+           $phone = $phone->update($request->all());
            $data['result'] = 'success';
             $data['type'] = 'updated';
 
        }else{
-           $property_phone = Property_phone::create($request->all());
+           $phone = Phone::create($request->all());
+           $propertyData =array(
+               'property_id' => $request->input('property_id'),
+               'phone_id' =>$phone->id
+           );
+           $property_phone = Property_phone::create($propertyData);
            $data['result'] = 'success';
             $data['type'] = 'created';
        }
        $property_id = $request->input('property_id');
        $phones = Property_phone::where('property_id' ,$property_id)->get();
-       $phoneArray = $this->getPropertyPhoneList($phones);
+        $phoneArray = $this->getPropertyPhoneList($phones);
        return response()->json(['response' => $data, 'phone' =>$phoneArray]);
     }
     function getPropertyPhoneList($phones){
         $phoneArrayList = array();
         if(count($phones)>0){
             foreach ($phones as $key_phone =>$phone){
-                $phoneType = $phone->property_phone_type;
+                $database_phone = $phone->phone;
+                $phoneType = $database_phone->property_phone_type;
                 $phoneArrayList[$key_phone]['phone_type_id'] = $phoneType->name;
                 $phoneArrayList[$key_phone]['id'] = $phone->id;
-                $phoneArrayList[$key_phone]['area_code'] = $phone->area_code;
-                $phoneArrayList[$key_phone]['phone_number'] = $phone->phone_number;
-                $phoneArrayList[$key_phone]['phone_ext'] = $phone->phone_ext;
-
+                $phoneArrayList[$key_phone]['area_code'] = $database_phone->area_code;
+                $phoneArrayList[$key_phone]['phone_number'] = $database_phone->phone_number;
+                $phoneArrayList[$key_phone]['phone_ext'] = $database_phone->phone_ext;
             }
         }
         return $phoneArrayList;
@@ -232,31 +274,32 @@ class PropertyController extends Controller
     public function postPropertyeditphonedata(Request $request){
         $property_phone_id = $request->input('property_phone_id');
         $property_phone = Property_phone::where('id',$property_phone_id)->first();
+        $phone = Phone::where('id',$property_phone->phone_id)->first();
         $data['result'] = 'success';
-        return response()->json(['response' =>$data, 'property_phone' => $property_phone]);
+        return response()->json(['response' =>$data, 'property_phone' => $property_phone,'phone' =>$phone]);
     }
     /*****property company contact *****/
     public function postPropertycompanycontact(Request $request){
         $property_contact_id = $request->input('property_contact_id');
         if($property_contact_id != ""){
-            $property_company_contact = Property_management_company_contact::where('id', $property_contact_id)->first();
+            $property_company_contact = Management_company_contact::where('id', $property_contact_id)->first();
             $property_company_contact->update($request->all());
             $data['result'] = 'success';
             $data['type'] = 'updated';
         }else{
-            $property_company_contact = Property_management_company_contact::create($request->all());
+            $property_company_contact = Management_company_contact::create($request->all());
             $data['result'] = 'success';
             $data['type'] = 'created';
         }
         $property_id = $request->input('property_id');
-        $property_company_id = $request->input('property_company_id');
-        $contacts = Property_management_company_contact::where('property_id' ,$property_id)->where('property_company_id',$property_company_id)->get();
+        $property_company_id = $request->input('management_company_id');
+        $contacts = Management_company_contact::where('management_company_id',$property_company_id)->get();
         $contactArray = $this->getPropertyContactList($contacts);
         return response()->json(['response' => $data, 'contact' =>$contactArray]);
     }
     public function postPropertyeditcompanycontactdata(Request $request){
         $property_contact_id = $request->input('property_contact_id');
-        $property_contact = Property_management_company_contact::where('id',$property_contact_id)->first();
+        $property_contact = Management_company_contact::where('id',$property_contact_id)->first();
         $data['result'] = 'success';
         return response()->json(['response' =>$data, 'property_contact' => $property_contact]);
     }
@@ -291,7 +334,6 @@ class PropertyController extends Controller
                 $contactArrayList[$key_contact]['first_name'] = $contact->first_name;
                 $contactArrayList[$key_contact]['last_name'] = $contact->last_name;
                 $contactArrayList[$key_contact]['email'] = $contact->email;
-
             }
         }
         return $contactArrayList;
@@ -348,35 +390,44 @@ class PropertyController extends Controller
 
     public function postPropertycompany(Request $request){
         $property_company_id = $request->input('property_company_id');
+        $property_id = $request->input('property_id');
+        $property = Property::where('id', $property_id)->first();
         if($property_company_id !=""){
-            $property_company = Property_management_company::where('id',$property_company_id)->first();
+            $property_company = Management_company::where('id',$property->management_company_id)->first();
             $property_company->update($request->all());
             $data['result'] = 'success';
             $data['type'] = 'updated';
         }else{
-            $property_company = Property_management_company::create($request->all());
+            $company = Management_company::create($request->all());
+            $property->management_company_id = $company->id;
+            $property->save();
             $data['result'] = 'success';
             $data['type'] = 'created';
         }
-        $property_id = $request->input('property_id');
-        $companies = Property_management_company::where('property_id' ,$property_id)->get();
+        if($property->management_company_id !=0){
+            $companies = Management_company::where('id' ,$property->management_company_id)->get();
+        }else{
+            $companies = "";
+        }
+
         return response()->json(['response' => $data, 'company' =>$companies]);
     }
 
     public function postPropertyeditcompanydata(Request $request){
         $property_company_id = $request->input('property_company_id');
-        $property_company = Property_management_company::where('id',$property_company_id)->first();
+        $property_company = Management_company::where('id',$property_company_id)->first();
         $data['result'] = 'success';
         return response()->json(['response' =>$data, 'property_company' => $property_company]);
     }
 
     public function postPropertyassigncompanydata(Request $request){
         $property_company_id = $request->input('property_company_id');
-        $property_company = Property_management_company::where('id',$property_company_id)->first();
-        $property_id = $property_company->property_id;
-        $phones = Property_management_company_phone::where('property_id' ,$property_id)->where('property_company_id',$property_company_id)->get();
+        $property_company = Management_company::where('id',$property_company_id)->first();
+        $property = Property::where('management_company_id', $property_company_id)->first();
+        $property_id = $property->property_id;
+        $phones = Management_company_phone::where('management_company_id',$property_company_id)->get();
         $phoneArray = $this->getPropertyPhoneList($phones);
-        $contacts = Property_management_company_contact::where('property_id' ,$property_id)->where('property_company_id',$property_company_id)->get();
+        $contacts = Management_company_contact::where('management_company_id',$property_company_id)->get();
         $contactArray = $this->getPropertyContactList($contacts);
         $data['result'] = 'success';
         return response()->json(['response' =>$data, 'property_company' => $property_company, 'phone' =>$phoneArray,'contact' =>$contactArray]);

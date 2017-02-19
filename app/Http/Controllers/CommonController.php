@@ -27,6 +27,7 @@ use App\Bid_type;
 
 use App\Bid_template;
 
+use App\File_type;
 class CommonController extends Controller
 {
     public function getSources(Request $request){
@@ -79,5 +80,10 @@ class CommonController extends Controller
     public function getBidtemplate(){
         $bidTemplates = Bid_template::all();
         return Response()->json(['response' =>$bidTemplates]);
+    }
+
+    public function getFiletype(){
+        $filetypes = File_type::all();
+        return Response()->json(['response' =>$filetypes]);
     }
 }

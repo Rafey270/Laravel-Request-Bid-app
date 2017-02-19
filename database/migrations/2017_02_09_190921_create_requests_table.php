@@ -14,8 +14,8 @@ class CreateRequestsTable extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('requester_name');
-            $table->string('requester_phone');
+            $table->string('requester_name')->nullable();
+            $table->string('requester_phone')->nullable();
             $table->string('requester_fax')->nullable();
             $table->string('scope')->nullable();
             $table->longText('details')->nullable();
@@ -52,44 +52,32 @@ class CreateRequestsTable extends Migration
                 ->references('id')->on('users')
                 ->onDelete('cascade');
 
+
+            $table->integer('approved_id')->unsigned()->nullable();
+
+//            $table->foreign('approved_id')
+//                ->references('id')->on('users')
+//                ->onDelete('cascade');
+
             $table->string('assign_date')->nullable();
+
+            $table->string('billing_date')->nullable();
+
+            $table->string('paid_date')->nullable();
 
             $table->integer('property_id')->unsigned()->nullable();
 
-//            $table->foreign('property_id')
-//                ->references('id')->on('properties')
-//                ->onDelete('cascade');
+            $table->integer('bid_template_id')->unsigned()->nullable();
 
-            $table->integer('property_phone_id')->unsigned()->nullable();
+            $table->integer('bid_type_id')->unsigned()->nullable();
 
-//            $table->foreign('property_phone_id')
-//                ->references('id')->on('property_phones')->onDelete('cascade');
+            $table->integer('approved_flag')->unsigned()->nullable();
 
-            $table->integer('property_contact_id')->unsigned()->nullable();
+            $table->integer('request_bid_job_id')->unsigned()->nullable();
 
-//            $table->foreign('property_contact_id')
-//                ->references('id')->on('property_contacts')->onDelete('cascade');
+            $table->boolean('archive_bid')->nullable()->default(0);
 
-            $table->integer('property_contact_phone_id')->unsigned()->nullable();
-
-//            $table->foreign('property_contact_phone_id')
-//                ->references('id')->on('property_contact_phones')->onDelete('cascade');
-
-            $table->integer('property_company_id')->unsigned()->nullable();
-
-//            $table->foreign('property_company_id')
-//                ->references('id')->on('property_management_companies')->onDelete('cascade');
-
-
-            $table->integer('property_company_phone_id')->unsigned()->nullable();
-
-//            $table->foreign('property_company_phone_id')
-//                ->references('id')->on('property_management_company_phones')->onDelete('cascade');
-
-            $table->integer('property_company_contact_id')->unsigned()->nullable();
-
-//            $table->foreign('property_company_contact_id')
-//                ->references('id')->on('property_management_company_contacts')->onDelete('cascade');
+            $table->string('due_date')->nullable();
 
             $table->timestamps();
         });

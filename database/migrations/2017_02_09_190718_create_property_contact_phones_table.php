@@ -14,13 +14,6 @@ class CreatePropertyContactPhonesTable extends Migration
     {
         Schema::create('property_contact_phones', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('phone_type_id')->unsigned();
-            $table->foreign('phone_type_id')
-                ->references('id')->on('phone_types')
-                ->onDelete('cascade');
-            $table->string('area_code')->nullable();
-            $table->string('phone_number')->nullable();
-            $table->string('phone_ext')->nullable();
 
             $table->integer('contact_id')->unsigned();
 
@@ -28,10 +21,10 @@ class CreatePropertyContactPhonesTable extends Migration
                 ->references('id')->on('contacts')
                 ->onDelete('cascade');
 
-            $table->integer('property_id')->unsigned();
+            $table->integer('phone_id')->unsigned();
 
-            $table->foreign('property_id')
-                ->references('id')->on('properties')
+            $table->foreign('phone_id')
+                ->references('id')->on('phones')
                 ->onDelete('cascade');
             $table->timestamps();
         });

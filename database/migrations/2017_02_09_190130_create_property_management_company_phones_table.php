@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePropertyPhonesTable extends Migration
+class CreatePropertyManagementCompanyPhonesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,13 +12,13 @@ class CreatePropertyPhonesTable extends Migration
      */
     public function up()
     {
-        Schema::create('property_phones', function (Blueprint $table) {
+        Schema::create('management_company_phones', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->integer('property_id')->unsigned();
+            $table->integer('management_company_id')->unsigned();
 
-            $table->foreign('property_id')
-                ->references('id')->on('properties')
+            $table->foreign('management_company_id')
+                ->references('id')->on('management_companies')
                 ->onDelete('cascade');
 
             $table->integer('phone_id')->unsigned();
@@ -27,6 +27,7 @@ class CreatePropertyPhonesTable extends Migration
                 ->references('id')->on('phones')
                 ->onDelete('cascade');
             $table->timestamps();
+
         });
     }
 
@@ -37,6 +38,6 @@ class CreatePropertyPhonesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('property_phones');
+        Schema::drop('management_company_phones');
     }
 }

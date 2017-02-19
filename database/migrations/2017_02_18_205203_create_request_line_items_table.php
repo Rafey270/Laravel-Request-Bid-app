@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCommentsTable extends Migration
+class CreateRequestLineItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,12 @@ class CreateCommentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('request_comments', function (Blueprint $table) {
+        Schema::create('request_line_items', function (Blueprint $table) {
             $table->increments('id');
-            $table->longText('comment')->nullable();
+            $table->longText('line_item_description')->nullable();
+            $table->longText('lump_sum')->nullable();
+            $table->string('order')->nullable();
+            $table->string('option_flag')->nullable();
 
             $table->integer('request_id')->unsigned();
 
@@ -27,7 +30,6 @@ class CreateCommentsTable extends Migration
             $table->foreign('creator_id')
                 ->references('id')->on('users')
                 ->onDelete('cascade');
-
             $table->timestamps();
         });
     }
@@ -39,6 +41,6 @@ class CreateCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('request_comments');
+        Schema::drop('request_line_items');
     }
 }

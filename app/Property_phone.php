@@ -5,16 +5,22 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Phone_type;
+
+use App\Property;
+
+use App\Phone;
 class Property_phone extends Model
 {
     protected $fillable = [
-        'phone_type_id',
-        'area_code',
-        'phone_number',
-        'phone_ext',
+        'phone_id',
         'property_id',
     ];
-    public function property_phone_type(){
-        return $this->belongsTo(Phone_type::class, 'phone_type_id');
+
+    public function property(){
+        return $this->belongsTo(Property::class, 'property_id');
+    }
+
+    public function phone(){
+        return $this->belongsTo(Phone::class, 'phone_id');
     }
 }

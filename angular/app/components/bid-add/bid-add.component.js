@@ -14,6 +14,11 @@ class BidAddController{
         if ($stateParams.alerts) {
             this.alerts.push($stateParams.alerts)
         }
+
+        let requestId = $stateParams.requestId
+
+        $scope.requestId = requestId
+
         $http.get('/api/common/bidtype').success(function(data,status,headers, config){
             var list = []
             angular.forEach(data.response, function(value){
@@ -27,6 +32,27 @@ class BidAddController{
                 list.push({id: value.id, name : value.name})
             })
             $scope.vm.systemBidTemplates = list
+        })
+        $http.get('/api/common/sources').success(function (data, status, headers, config) {
+            var list = []
+            angular.forEach(data.response, function (value) {
+                list.push({id: value.id, name: value.source_name})
+            })
+            $scope.vm.systemSources = list
+        })
+        $http.get('/api/common/bidstatus').success(function (data, status, headers, config) {
+            var list = []
+            angular.forEach(data.response, function (value) {
+                list.push({id: value.id, name: value.bid_status_name})
+            })
+            $scope.vm.systemBidStatus = list
+        })
+        $http.get('/api/common/estimator').success(function (data, status, headers, config) {
+            var list = []
+            angular.forEach(data.response, function (value) {
+                list.push({id: value.id, name: value.name})
+            })
+            $scope.vm.systemEstimators = list
         })
 
         /******calendar start*****/
@@ -122,121 +148,74 @@ class BidAddController{
 
             return '';
         }
-        /*******Calendar End*****/
 
-        $scope.ShowAddEditBidLineItem = function(){
-            let dataSet = $scope.line_items
-            $scope.vm.dtOptions10 = DTOptionsBuilder.newOptions()
-                .withOption('data', dataSet)
-                .withOption('createdRow', createdRow)
-                .withOption('responsive', true)
-                .withBootstrap()
-            $scope.vm.dtColumns10 = [
-                DTColumnBuilder.newColumn(null).withTitle('#').renderWith(actionsBidLineItemHtml),
-                DTColumnBuilder.newColumn('description').withTitle('Line Item Description'),
-                DTColumnBuilder.newColumn('lump_sum').withTitle('Lump Sum'),
-                DTColumnBuilder.newColumn('created_by').withTitle('Created By'),
-                DTColumnBuilder.newColumn('created_date').withTitle('Created Date'),
-            ]
-            $scope.vm.displayTable10  = true
-        }
-        let actionsBidLineItemHtml = (data) =>{
-            return `
-                <input type="radio"  name="property_comment_id" value="${data.id}" ng-model="vm.line_items.property_item_id" ng-select = "{data.id} == {$scope.vm.line_items.property_item_id}">
-                `
-        }
+        $scope.bidTemplateNgShow = false
+        if(requestId !=  "" && requestId != null){
+            var formData = {
+                'requestId'  : requestId
+            }
+            $http.post('/api/request/getrequest',formData).success(function(data,status,headers, config) {
+                $scope.vm.scope = data.request.scope
+                $scope.vm.details = data.request.details
+                $scope.vm.source_id = data.request.source_id.toString()
+                $scope.vm.bid_statuses_id = data.request.bid_statuses_id.toString()
+                $scope.vm.estimator_id = data.request.estimator_id.toString()
 
+                if(data.response.property.length  != 0){
+                    $scope.property_name = data.response.property.property_name
+                    $scope.property_street = data.response.property.property_street
+                    $scope.property_city = data.response.property.property_city
+                    $scope.property_state = data.response.property.property_state
+                    $scope.property_zip =   data.response.property.property_zip
 
-        $scope.ShowAddEditBidContact = function(){
-            let dataSet = $scope.bid_contacts
-            $scope.vm.dtOptions11 = DTOptionsBuilder.newOptions()
-                .withOption('data', dataSet)
-                .withOption('createdRow', createdRow)
-                .withOption('responsive', true)
-                .withBootstrap()
-            $scope.vm.dtColumns11 = [
-                DTColumnBuilder.newColumn(null).withTitle('#').renderWith(actionsBidContactHtml),
-                DTColumnBuilder.newColumn('contact_type').withTitle('Contact Type'),
-                DTColumnBuilder.newColumn('first_name').withTitle('First Name'),
-                DTColumnBuilder.newColumn('last_name').withTitle('Last Name'),
-                DTColumnBuilder.newColumn('email').withTitle('Email'),
-            ]
-            $scope.vm.displayTable11  = true
-        }
-        let actionsBidContactHtml = (data) =>{
-            return `
-                <input type="radio"  name="property_contact_id" value="${data.id}" ng-model="vm.contacts.property_contact_id" ng-select = "{data.id} == {$scope.vm.contacts.property_contact_id}">
-                `
-        }
+                }else{
+                    $scope.property_name = ""
+                    $scope.property_street = ""
+                    $scope.property_city = ""
+                    $scope.property_state = ""
+                    $scope.property_zip =   ""
+                }
+                $scope.property_phone = data.response.property_phone
+                $scope.property_fax = data.response.property_fax
+                $scope.contact = data.response.contact_name
+                if(data.response.property_company_list.length != 0){
+                    $scope.management_company = data.response.property_company_list.management_company
+                    $scope.management_company_street = data.response.property_company_list.management_company_street
+                    $scope.management_company_city = data.response.property_company_list.management_company_city
+                    $scope.management_company_state = data.response.property_company_list.management_company_state
+                    $scope.management_company_zip = data.response.property_company_list.management_company_zip
+                }else{
+                    $scope.management_company = ""
+                    $scope.management_company_street = ""
+                    $scope.management_company_city = ""
+                    $scope.management_company_state = ""
+                    $scope.management_company_zip = ""
+                }
 
-        $scope.ShowAddEditBidFile = function(){
-            let dataSet = $scope.bid_contacts
-            $scope.vm.dtOptions12 = DTOptionsBuilder.newOptions()
-                .withOption('data', dataSet)
-                .withOption('createdRow', createdRow)
-                .withOption('responsive', true)
-                .withBootstrap()
-            $scope.vm.dtColumns12 = [
-                DTColumnBuilder.newColumn(null).withTitle('#').renderWith(actionsBidFileHtml),
-                DTColumnBuilder.newColumn('file_type').withTitle('File Type'),
-                DTColumnBuilder.newColumn('description').withTitle('Description'),
-                DTColumnBuilder.newColumn('file_name').withTitle('File Name'),
-                DTColumnBuilder.newColumn('created_by').withTitle('Created By'),
-                DTColumnBuilder.newColumn('created_date').withTitle('Created Date'),
-            ]
-            $scope.vm.displayTable12  = true
-        }
+                $scope.management_company_phone = data.response.company_phone
+                $scope.management_company_fax = data.response.company_phone_fax
+                $scope.assign_request_id = data.request.id
 
-        let actionsBidFileHtml = (data) =>{
-            return `
-                <input type="radio"  name="property_file_id" value="${data.id}" ng-model="vm.files.property_file_id" ng-select = "{data.id} == {$scope.vm.files.property_file_id}">
-                `
-        }
-        $scope.ShowAddEditBidComment = function(){
-            let dataSet = $scope.bid_comments
-            $scope.vm.dtOptions13 = DTOptionsBuilder.newOptions()
-                .withOption('data', dataSet)
-                .withOption('createdRow', createdRow)
-                .withOption('responsive', true)
-                .withBootstrap()
-            $scope.vm.dtColumns13 = [
-                DTColumnBuilder.newColumn(null).withTitle('#').renderWith(actionsRequestCommentHtml),
-                DTColumnBuilder.newColumn('comment').withTitle('Comment'),
-                DTColumnBuilder.newColumn('creator_id').withTitle('Creator'),
-            ]
-            $scope.vm.displayTable13  = true
-        }
-        let actionsRequestCommentHtml = (data) =>{
-            return `
-                <input type="radio"  name="property_comment_id" value="${data.id}" ng-model="vm.comment.property_comment_id" ng-select = "{data.id} == {$scope.vm.comment.property_comment_id}">
-                `
-        }
+                $scope.assign_property_id = $rootScope.assign_property_id = data.property_list.property_id
+                $scope.assign_contact_id = $rootScope.assign_contact_id =  data.property_list.property_contact_id
+                $scope.assign_contact_phone_id = $rootScope.assign_contact_phone_id = data.property_list.property_contact_phone_id
+                $scope.assign_phone_id = $rootScope.assign_phone_id  = data.property_list.property_phone_id
+                $scope.assign_company_id = $rootScope.assign_company_id  = data.property_list.property_company_id
+                $scope.assign_company_phone_id = $rootScope.assign_company_phone_id  = data.property_list.property_company_phone_id
+                $scope.assign_company_contact_id = $rootScope.assign_company_contact_id  = data.property_list.property_company_contact_id
 
-        $scope.ShowAddEditBidNotification = function(){
-            let dataSet = $scope.bid_notifications
-            $scope.vm.dtOptions14 = DTOptionsBuilder.newOptions()
-                .withOption('data', dataSet)
-                .withOption('createdRow', createdRow)
-                .withOption('responsive', true)
-                .withBootstrap()
-            $scope.vm.dtColumns14 = [
-                DTColumnBuilder.newColumn('notification_type').withTitle('Notification Type'),
-                DTColumnBuilder.newColumn('sent_to').withTitle('Sent To'),
-                DTColumnBuilder.newColumn('sent_date').withTitle('Sent Date'),
-            ]
-            $scope.vm.displayTable14  = true
+                $rootScope.$broadcast("initial-property-value")
+            })
+        }else{
+            $scope.assign_property_id = $rootScope.assign_property_id = ""
+            $scope.assign_contact_id = $rootScope.assign_contact_id =  ""
+            $scope.assign_contact_phone_id = $rootScope.assign_contact_phone_id = ""
+            $scope.assign_phone_id = $rootScope.assign_phone_id  = ""
+            $scope.assign_company_id = $rootScope.assign_company_id  = ""
+            $scope.assign_company_phone_id = $rootScope.assign_company_phone_id  = ""
+            $scope.assign_company_contact_id = $rootScope.assign_company_contact_id  = ""
+            $rootScope.$broadcast("initial-property-empty-value")
         }
-
-
-        let createdRow = (row) => {
-            $compile(angular.element(row).contents())($scope)
-        }
-
-        $scope.ShowAddEditBidLineItem()
-        $scope.ShowAddEditBidContact()
-        $scope.ShowAddEditBidFile()
-        $scope.ShowAddEditBidComment()
-        $scope.ShowAddEditBidNotification()
         $scope.$on('update-property-value', function() {
             $scope.assign_property_id = $rootScope.assign_property_id
             $scope.assign_contact_id = $rootScope.assign_contact_id
@@ -262,10 +241,28 @@ class BidAddController{
             $scope.management_company_phone = $rootScope.management_company_phone
             $scope.management_company_fax = $rootScope.management_company_fax
         })
+
+        $scope.selectedBidTypeChange = function(){
+            if($scope.vm.bid_type_id !=""){
+                console.log($scope.vm.bid_type_id)
+
+                if($scope.vm.bid_type_id =="Standard"){
+                    $scope.isStandard =true
+                    $scope.bidTemplateNgShow = true
+                }else{
+                    $scope.isStandard =false
+                    $scope.bidTemplateNgShow = false
+                }
+                $scope.vm.save()
+                this.formSubmitted = false
+            }
+
+        }
+
     }
     modalOpen(size) {
         let $uibModal = this.$uibModal
-        let $scope = this.$scope
+        let $scope = this.$scopeisStandard
         let $log = this.$log
         let items = this.items
 
@@ -315,6 +312,24 @@ class BidAddController{
             })
             $scope.mvm.systemContactTypes = list
         })
+        $scope.$on('initial-property-value', function() {
+            $scope.assign_property_id = $rootScope.assign_property_id
+            $scope.assign_contact_id = $rootScope.assign_contact_id
+            $scope.assign_contact_phone_id = $rootScope.assign_contact_phone_id
+            $scope.assign_phone_id = $rootScope.assign_phone_id
+            $scope.assign_company_id = $rootScope.assign_company_id
+            $scope.assign_company_phone_id = $rootScope.assign_company_phone_id
+            $scope.assign_company_contact_id = $rootScope.assign_company_contact_id
+        })
+        $scope.$on('initial-property-empty-value', function() {
+            $scope.assign_property_id = $rootScope.assign_property_id
+            $scope.assign_contact_id = $rootScope.assign_contact_id
+            $scope.assign_contact_phone_id = $rootScope.assign_contact_phone_id
+            $scope.assign_phone_id = $rootScope.assign_phone_id
+            $scope.assign_company_id = $rootScope.assign_company_id
+            $scope.assign_company_phone_id = $rootScope.assign_company_phone_id
+            $scope.assign_company_contact_id = $rootScope.assign_company_contact_id
+        })
 
         function initNew() {
             $scope.mvm.new ={
@@ -322,30 +337,32 @@ class BidAddController{
 
                 },
                 phone : {
-                    property_phone_id : ""
+                    property_phone_id : $scope.assign_phone_id
                 },
                 contact:{
-                    property_contact_id : ""
+                    property_contact_id : $scope.assign_contact_id
                 },
                 comment:{
                     property_comment_id : ""
                 },
                 management:{
-                    property_company_id: ""
+                    property_company_id: $scope.assign_company_id
                 },
                 assignmanagement:{
 
                 },
                 companyphone:{
-                    property_phone_id: ""
+                    property_phone_id: $scope.assign_company_phone_id
                 },
                 companycontact:{
-                    property_contact_id : ""
+                    property_contact_id : $scope.assign_company_contact_id
                 }
             }
             $scope.mvm.search = {
 
             }
+            $scope.mvm.property_show_id =$scope.assign_property_id
+            $scope.mvm.property_id = ""
             $scope.mvm.property_phone_add_edit = ""
             $scope.mvm.property_contact_add_edit = ""
             $scope.mvm.property_comment_add_edit = ""
@@ -354,8 +371,7 @@ class BidAddController{
             $scope.mvm.property_company_contact_add_edit = ""
         }
 
-        initNew()
-        $scope.mvm.property_show_id = ""
+
 
         /*******Get Properties*******/
         $scope.onGetPropertiesBody = function(data){
@@ -395,7 +411,7 @@ class BidAddController{
                 <input type="radio"  name="property_id" value="${data.id}" ng-model="mvm.property_show_id" ng-select = "{data.id} == {$scope.mvm.property_show_id}">
                 `
         }
-
+        initNew()
         $scope.onGetProperties()
         $scope.onAssignSelectedProperty = function(){
             $scope.formData ={
@@ -512,6 +528,11 @@ class BidAddController{
                                     property_company_id: data.company[0].id
                                 }
                             }
+                        }
+                        if(data.company.length != 0){
+                            $scope.managementcompanyempty = false
+                        }else{
+                            $scope.managementcompanyempty = true
                         }
 
                         $scope.showAddEditPropertyPhoneList(data)
@@ -736,6 +757,11 @@ class BidAddController{
                             $scope.showAddEditPropertyPhoneList(data)
                             $scope.showAddEditPropertyContactList(data)
                             $scope.showAddEditPropertyCommentList(data)
+                            if(data.company.length != 0){
+                                $scope.managementcompanyempty = false
+                            }else{
+                                $scope.managementcompanyempty = true
+                            }
                             $scope.showAddEditPropertyCompanyList(data)
 
                         }
@@ -753,7 +779,7 @@ class BidAddController{
                     'phone_number': this.new.companyphone.phone_number,
                     'phone_ext': this.new.companyphone.phone_ext,
                     'property_id': this.property_id,
-                    'property_company_id':this.new.assign_company,
+                    'management_company_id':this.new.assign_company,
                     'property_phone_id' : this.property_company_phone_add_edit
                 }
                 $http({
@@ -794,10 +820,10 @@ class BidAddController{
                     .success(function(data) {
                         if(data.response.result == "success"){
                             $scope.mvm.property_company_phone_add_edit = data.property_phone.id
-                            $scope.mvm.new.companyphone.phone_type_id = data.property_phone.phone_type_id
-                            $scope.mvm.new.companyphone.area_code = data.property_phone.area_code
-                            $scope.mvm.new.companyphone.phone_number = data.property_phone.phone_number
-                            $scope.mvm.new.companyphone.phone_ext =data.property_phone.phone_ext
+                            $scope.mvm.new.companyphone.phone_type_id = data.phone.phone_type_id
+                            $scope.mvm.new.companyphone.area_code = data.phone.area_code
+                            $scope.mvm.new.companyphone.phone_number = data.phone.phone_number
+                            $scope.mvm.new.companyphone.phone_ext =data.phone.phone_ext
                             $scope.onClickAddCompanyPhone()
                         }
                     })
@@ -814,7 +840,7 @@ class BidAddController{
                     'last_name': this.new.companycontact.last_name,
                     'email': this.new.companycontact.email,
                     'property_id': this.property_id,
-                    'property_company_id':this.new.assign_company,
+                    'management_company_id':this.new.assign_company,
                     'property_contact_id' : this.property_company_contact_add_edit
                 }
                 $http({
@@ -913,10 +939,10 @@ class BidAddController{
                     .success(function(data) {
                         if(data.response.result == "success"){
                             $scope.mvm.property_phone_add_edit = data.property_phone.id
-                            $scope.mvm.new.phone.phone_type_id = data.property_phone.phone_type_id
-                            $scope.mvm.new.phone.area_code = data.property_phone.area_code
-                            $scope.mvm.new.phone.phone_number = data.property_phone.phone_number
-                            $scope.mvm.new.phone.phone_ext =data.property_phone.phone_ext
+                            $scope.mvm.new.phone.phone_type_id = data.phone.phone_type_id
+                            $scope.mvm.new.phone.area_code = data.phone.area_code
+                            $scope.mvm.new.phone.phone_number = data.phone.phone_number
+                            $scope.mvm.new.phone.phone_ext =data.phone.phone_ext
                             $scope.onClickAddPhone()
                         }
                     })
@@ -1063,6 +1089,11 @@ class BidAddController{
                                 $scope.mvm.new.management = {
                                     property_company_id :data.company[0].id
                                 }
+                            }
+                            if(data.company.length != 0){
+                                $scope.managementcompanyempty = false
+                            }else{
+                                $scope.managementcompanyempty = true
                             }
                             $scope.showAddEditPropertyCompanyList(data)
                         }
@@ -1338,6 +1369,43 @@ class BidAddController{
             $compile(angular.element(row).contents())($scope)
         }
 
+    }
+    save(isValid) {
+
+        if (isValid){
+            let $state = this.$state
+            let  convertDate  = ""
+            if(this.$scope.vm.due_date !=""){
+                convertDate =this.$scope.convert(this.$scope.vm.due_date)
+            }else{
+                convertDate  = ""
+            }
+            this.$scope.formData ={
+                'bid_type_id' : this.$scope.vm.bid_type_id,
+                'bid_template_id' : this.$scope.vm.bid_template_id,
+                'due_date' : convertDate,
+                'archive_bid' : this.$scope.vm.archive_bid,
+                'scope' : this.$scope.vm.scope,
+                'details' : this.$scope.vm.details,
+                'source_id' : this.$scope.vm.source_id,
+                'bid_statuses_id' : this.$scope.vm.bid_statuses_id,
+                'estimator_id' : this.$scope.vm.estimator_id,
+                'request_id' : this.$scope.requestId,
+                'property_id' : this.$scope.assign_property_id
+            }
+            this.$http({
+                method  : 'POST',
+                url     : '/api/bid/bid',
+                data    : $.param(this.$scope.formData),  // pass in data as strings
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+            })
+            .success(function(data) {
+                var bidId = data.response.id
+                $state.go('app.bidsedit',{'bidId': bidId})
+            })
+        }else{
+            this.formSubmitted = true
+        }
     }
 
     $onInit(){

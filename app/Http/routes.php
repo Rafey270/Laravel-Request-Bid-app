@@ -35,6 +35,7 @@ $api->group(['middleware' => ['api', 'api.auth']], function ($api) {
     $api->controller('common', 'CommonController');
     $api->controller('property', 'PropertyController');
     $api->controller('request', 'RequestController');
+    $api->controller('bid', 'BidController');
 });
 
 $api->group(['middleware' => ['api', 'api.auth', 'role:admin.super|admin.user']], function ($api) {

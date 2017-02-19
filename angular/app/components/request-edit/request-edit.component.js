@@ -35,6 +35,7 @@ class RequestEditController{
             $scope.vm.systemEstimators = list
         })
         let requestId = $stateParams.requestId
+        $scope.requestId = $stateParams.requestId
         var formData = {
             'requestId'  : requestId
         }
@@ -86,47 +87,14 @@ class RequestEditController{
             $scope.management_company_phone = data.response.company_phone
             $scope.management_company_fax = data.response.company_phone_fax
             $scope.assign_request_id = data.request.id
-            if(data.request.property_id != 0){
-                $scope.assign_property_id = $rootScope.assign_property_id = data.request.property_id
-            }else{
-                $scope.assign_property_id = $rootScope.assign_property_id = ""
-            }
 
-            if(data.request.property_contact_id !=0){
-                $scope.assign_contact_id = $rootScope.assign_contact_id =  data.request.property_contact_id
-            }else{
-                $scope.assign_contact_id = $rootScope.assign_contact_id =  ""
-            }
-
-            if(data.request.property_contact_phone_id !=0 && data.request.property_contact_phone_id != ""){
-                $scope.assign_contact_phone_id = $rootScope.assign_contact_phone_id = data.request.property_contact_phone_id
-            }else{
-                $scope.assign_contact_phone_id = $rootScope.assign_contact_phone_id = ""
-            }
-
-            if(data.request.property_phone_id !=0 ){
-                $scope.assign_phone_id = $rootScope.assign_phone_id  = data.request.property_phone_id
-            }else{
-                $scope.assign_phone_id = $rootScope.assign_phone_id = ""
-            }
-
-            if(data.request.property_company_id !=0 ){
-                $scope.assign_company_id = $rootScope.assign_company_id  = data.request.property_company_id
-            }else{
-                $scope.assign_company_id = $rootScope.assign_company_id = ""
-            }
-
-            if(data.request.property_company_phone_id !=0 ){
-                $scope.assign_company_phone_id = $rootScope.assign_company_phone_id  = data.request.property_company_phone_id
-            }else{
-                $scope.assign_company_phone_id = $rootScope.assign_company_phone_id = ""
-            }
-
-            if(data.request.property_company_contact_id !=0 ){
-                $scope.assign_company_contact_id = $rootScope.assign_company_contact_id  = data.request.property_company_contact_id
-            }else{
-                $scope.assign_company_contact_id = $rootScope.assign_company_contact_id = ""
-            }
+            $scope.assign_property_id = $rootScope.assign_property_id = data.property_list.property_id
+            $scope.assign_contact_id = $rootScope.assign_contact_id =  data.property_list.property_contact_id
+            $scope.assign_contact_phone_id = $rootScope.assign_contact_phone_id = data.property_list.property_contact_phone_id
+            $scope.assign_phone_id = $rootScope.assign_phone_id  = data.property_list.property_phone_id
+            $scope.assign_company_id = $rootScope.assign_company_id  = data.property_list.property_company_id
+            $scope.assign_company_phone_id = $rootScope.assign_company_phone_id  = data.property_list.property_company_phone_id
+            $scope.assign_company_contact_id = $rootScope.assign_company_contact_id  = data.property_list.property_company_contact_id
 
             $rootScope.$broadcast("initial-property-value")
             if (!$scope.vm.comment.property_comment_id) {
@@ -181,6 +149,22 @@ class RequestEditController{
             this.requestCommentAddForm.$setPristine()
             this.requestCommentAddForm.$setUntouched()
             this.formSubmitted = false
+        }
+
+        $scope.createBid = function(){
+            $scope.formData = {
+                'request_id': $scope.requestId,
+            }
+            $http({
+                method  : 'POST',
+                url     : '/api/request/requestbid',
+                data    : $.param($scope.formData),  // pass in data as strings
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+            })
+            .success(function(data) {
+                var redirectRequestId = data.response.id
+                $state.go("app.bidsadd",{"requestId": redirectRequestId})
+            })
         }
         this.requestCommentSave = function(isValid){
             if (isValid) {
@@ -333,7 +317,7 @@ class RequestEditController{
             })
             $scope.mvm.systemContactTypes = list
         })
-        $scope.$on('update-property-value', function() {
+        $scope.$on('initial-property-value', function() {
             $scope.assign_property_id = $rootScope.assign_property_id
             $scope.assign_contact_id = $rootScope.assign_contact_id
             $scope.assign_contact_phone_id = $rootScope.assign_contact_phone_id
@@ -374,7 +358,7 @@ class RequestEditController{
 
             }
             $scope.mvm.property_show_id =$scope.assign_property_id
-            $scope.mvm.property_id = $scope.assign_property_id
+            $scope.mvm.property_id = ""
             $scope.mvm.property_phone_add_edit = ""
             $scope.mvm.property_contact_add_edit = ""
             $scope.mvm.property_comment_add_edit = ""
@@ -383,8 +367,7 @@ class RequestEditController{
             $scope.mvm.property_company_contact_add_edit = ""
         }
 
-        initNew()
-        $scope.mvm.property_show_id = ""
+
 
         /*******Get Properties*******/
         $scope.onGetPropertiesBody = function(data){
@@ -424,7 +407,7 @@ class RequestEditController{
                 <input type="radio"  name="property_id" value="${data.id}" ng-model="mvm.property_show_id" ng-select = "{data.id} == {$scope.mvm.property_show_id}">
                 `
         }
-
+        initNew()
         $scope.onGetProperties()
         $scope.onAssignSelectedProperty = function(){
             $scope.formData ={
@@ -542,6 +525,11 @@ class RequestEditController{
                                 }
                             }
                         }
+                        if(data.company.length != 0){
+                            $scope.managementcompanyempty = false
+                        }else{
+                            $scope.managementcompanyempty = true
+                        }
 
                         $scope.showAddEditPropertyPhoneList(data)
                         $scope.showAddEditPropertyContactList(data)
@@ -608,7 +596,7 @@ class RequestEditController{
         /*** phone add and edit  ****/
         $scope.onClickAddPhone = function () {
             $scope.mvm.formSubmitted = false
-            $scope.property_phone_form_show = true
+            $scope.request_comment_form_show = true
         }
         $scope.onClickPhoneNumberCancel = function(){
             angular.forEach(Object.keys($scope.mvm.new.phone), function(key){
@@ -765,6 +753,11 @@ class RequestEditController{
                             $scope.showAddEditPropertyPhoneList(data)
                             $scope.showAddEditPropertyContactList(data)
                             $scope.showAddEditPropertyCommentList(data)
+                            if(data.company.length != 0){
+                                $scope.managementcompanyempty = false
+                            }else{
+                                $scope.managementcompanyempty = true
+                            }
                             $scope.showAddEditPropertyCompanyList(data)
 
                         }
@@ -782,7 +775,7 @@ class RequestEditController{
                     'phone_number': this.new.companyphone.phone_number,
                     'phone_ext': this.new.companyphone.phone_ext,
                     'property_id': this.property_id,
-                    'property_company_id':this.new.assign_company,
+                    'management_company_id':this.new.assign_company,
                     'property_phone_id' : this.property_company_phone_add_edit
                 }
                 $http({
@@ -823,10 +816,10 @@ class RequestEditController{
                     .success(function(data) {
                         if(data.response.result == "success"){
                             $scope.mvm.property_company_phone_add_edit = data.property_phone.id
-                            $scope.mvm.new.companyphone.phone_type_id = data.property_phone.phone_type_id
-                            $scope.mvm.new.companyphone.area_code = data.property_phone.area_code
-                            $scope.mvm.new.companyphone.phone_number = data.property_phone.phone_number
-                            $scope.mvm.new.companyphone.phone_ext =data.property_phone.phone_ext
+                            $scope.mvm.new.companyphone.phone_type_id = data.phone.phone_type_id
+                            $scope.mvm.new.companyphone.area_code = data.phone.area_code
+                            $scope.mvm.new.companyphone.phone_number = data.phone.phone_number
+                            $scope.mvm.new.companyphone.phone_ext =data.phone.phone_ext
                             $scope.onClickAddCompanyPhone()
                         }
                     })
@@ -843,7 +836,7 @@ class RequestEditController{
                     'last_name': this.new.companycontact.last_name,
                     'email': this.new.companycontact.email,
                     'property_id': this.property_id,
-                    'property_company_id':this.new.assign_company,
+                    'management_company_id':this.new.assign_company,
                     'property_contact_id' : this.property_company_contact_add_edit
                 }
                 $http({
@@ -942,10 +935,10 @@ class RequestEditController{
                     .success(function(data) {
                         if(data.response.result == "success"){
                             $scope.mvm.property_phone_add_edit = data.property_phone.id
-                            $scope.mvm.new.phone.phone_type_id = data.property_phone.phone_type_id
-                            $scope.mvm.new.phone.area_code = data.property_phone.area_code
-                            $scope.mvm.new.phone.phone_number = data.property_phone.phone_number
-                            $scope.mvm.new.phone.phone_ext =data.property_phone.phone_ext
+                            $scope.mvm.new.phone.phone_type_id = data.phone.phone_type_id
+                            $scope.mvm.new.phone.area_code = data.phone.area_code
+                            $scope.mvm.new.phone.phone_number = data.phone.phone_number
+                            $scope.mvm.new.phone.phone_ext =data.phone.phone_ext
                             $scope.onClickAddPhone()
                         }
                     })
@@ -1092,6 +1085,11 @@ class RequestEditController{
                                 $scope.mvm.new.management = {
                                     property_company_id :data.company[0].id
                                 }
+                            }
+                            if(data.company.length != 0){
+                                $scope.managementcompanyempty = false
+                            }else{
+                                $scope.managementcompanyempty = true
                             }
                             $scope.showAddEditPropertyCompanyList(data)
                         }
@@ -1382,12 +1380,6 @@ class RequestEditController{
                 'bid_statuses_id' : this.$scope.vm.bid_statuses_id,
                 'estimator_id' : this.$scope.vm.estimator_id,
                 'property_id' : this.$scope.assign_property_id,
-                'property_phone_id' : this.$scope.assign_phone_id,
-                'property_contact_id' : this.$scope.assign_contact_id,
-                'property_contact_phone_id' : "",
-                'property_company_id' : this.$scope.assign_company_id,
-                'property_company_phone_id' : this.$scope.assign_company_phone_id,
-                'property_company_contact_id' : this.$scope.assign_company_contact_id,
                 'request_id': this.$scope.assign_request_id
             }
             this.$http({

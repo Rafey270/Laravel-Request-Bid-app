@@ -14,6 +14,7 @@ class Property extends Model
         'property_state',
         'property_zip',
         'property_country',
-        'mail_to_type_id'
+        'mail_to_type_id',
+        'management_company_id'
     ];
 }

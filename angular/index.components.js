@@ -1,3 +1,4 @@
+import {BidEditComponent} from './app/components/bid-edit/bid-edit.component';
 import {BidAddComponent} from './app/components/bid-add/bid-add.component';
 import {BidsComponent} from './app/components/bids/bids.component';
 import {RequestEditComponent} from './app/components/request-edit/request-edit.component';
@@ -33,6 +34,7 @@ import { LoginFormComponent } from './app/components/login-form/login-form.compo
 import { RegisterFormComponent } from './app/components/register-form/register-form.component'
 
 angular.module('app.components')
+	.component('bidEdit', BidEditComponent)
 	.component('bidAdd', BidAddComponent)
 	.component('bids', BidsComponent)
 	.component('requestEdit', RequestEditComponent)

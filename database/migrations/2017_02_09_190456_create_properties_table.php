@@ -32,6 +32,11 @@ class CreatePropertiesTable extends Migration
                 ->references('id')->on('mail_to_types')
                 ->onDelete('cascade');
 
+            $table->integer('management_company_id')->unsigned()->nullable();
+//            $table->foreign('management_company_id')
+//                ->references('id')->on('management_companies')
+//                ->onDelete('cascade');
+
             $table->timestamps();
         });
     }

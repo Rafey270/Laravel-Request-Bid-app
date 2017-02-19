@@ -86,15 +86,25 @@
     .border-bottom-2-soild {
         border-bottom: 2px solid #ccc;
     }
+    .font-weight-900{
+        font-weight: 900;
+    }
+    .margin-bottom-10 { margin-bottom: 10px}
+    .margin-bottom-20 { margin-bottom: 20px}
+    .margin-bottom-30 { margin-bottom: 30px}
+    .margin-bottom-40 { margin-bottom: 40px}
+    .margin-bottom-50 { margin-bottom: 50px}
+    .margin-bottom-60 { margin-bottom: 60px}
+
 </style>
 <section class="content-header">
-    <h1>Requests
+    <h1>Bids
         <small>Module description here</small>
     </h1>
     <ol class="breadcrumb">
         <li><a ui-sref="app.landing"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a ui-sref="app.requests">Request Lists</a></li>
-        <li class="active">Add Request</li>
+        <li><a ui-sref="app.bids">Bid Lists</a></li>
+        <li class="active">Edit Bid</li>
     </ol>
 </section>
 <section class="content">
@@ -102,250 +112,395 @@
         <div class="col-sm-12 col-md-12">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Add Request</h3>
+                    <h3 class="box-title">Edit Bid</h3>
                 </div>
                 <div class="box-body">
-                    <div class="row" style="margin-bottom: 30px">
+                    <div class="row margin-bottom-30">
                         <div class="col-md-12">
                             <div class="form-group text-right">
-                                <button type="button" class="btn btn-primary text-right" ng-click="vm.modalOpen('lg')">
-                                    Assign Property
-                                </button>
+                                <a href="javascript:void(0)" class="btn btn-primary">Create Job</a>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 col-sm-6" style="margin-bottom: 50px">
-
-                            <form class="form-horizontal" name="requestForm"
-                                  ng-submit="vm.save(requestForm.$valid, requestForm)" novalidate>
-                                <div ng-if="vm.alerts" class="alert alert-{{alert.type}}"
-                                     ng-repeat="alert in vm.alerts">
-                                    <h4>{{alert.title}}</h4>
-                                    <p>{{alert.msg}}</p>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group"
-                                             ng-class="{ 'has-error': requestForm.requester_name.$invalid && ( vm.formSubmitted || requestForm.requester_name.$touched) }">
-                                            <div class="col-sm-12">
-                                                <input type="text" class="form-control" ng-model="vm.requester_name"
-                                                       name="requester_name"
-                                                       placeholder="Requester Name" required>
-                                                <p ng-show="requestForm.requester_name.$error.required && ( vm.formSubmitted || requestForm.requester_name.$touched)"
-                                                   class="help-block">Requester name is required.</p>
-                                            </div>
+                        <form name="viewBidAddBidForm"  ng-submit="vm.save(viewBidAddBidForm.$valid, viewBidAddBidForm)" novalidate>
+                            <div ng-if="vm.alerts" class="alert alert-{{alert.type}}"
+                                 ng-repeat="alert in vm.alerts">
+                                <h4>{{alert.title}}</h4>
+                                <p>{{alert.msg}}</p>
+                            </div>
+                            <div class="col-md-6 col-sm-6 margin-bottom-20">
+                                <div class="row margin-bottom-40">
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="form-group" ng-class="{ 'has-error': viewBidAddBidForm.bid_type_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.bid_type_id.$touched) }">
+                                            <select class="form-control" name="bid_type_id"  ng-model="vm.bid_type_id" ng-change="selectedBidTypeChange()" required>
+                                                <option value="">Select Bid Type</option>
+                                                <option value="{{bidtype.name}}"
+                                                        ng-repeat="bidtype in vm.systemBidTypes">
+                                                    {{bidtype.name}}
+                                                </option>
+                                            </select>
+                                            <p ng-show="viewBidAddBidForm.bid_type_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.bid_type_id.$touched)"
+                                               class="help-block">Bid type is required.
+                                            </p>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-6">
-                                        <div class="form-group"
-                                             ng-class="{ 'has-error': requestForm.requester_phone.$invalid && ( vm.formSubmitted || requestForm.requester_phone.$touched) }">
-                                            <div class="col-sm-12">
-                                                <input type="text" class="form-control" ng-model="vm.requester_phone"
-                                                       name="requester_phone"
-                                                       placeholder="Requester Phone" required>
-                                                <p ng-show="requestForm.requester_phone.$error.required && ( vm.formSubmitted || requestForm.requester_phone.$touched)"
-                                                   class="help-block">Requester phone is required.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-6">
-                                        <div class="form-group"
-                                             ng-class="{ 'has-error': requestForm.requester_fax.$invalid && ( vm.formSubmitted || requestForm.requester_fax.$touched) }">
-                                            <div class="col-sm-12">
-                                                <input type="text" class="form-control" ng-model="vm.requester_fax"
-                                                       name="requester_fax" placeholder="Request Fax">
-                                                <p ng-show="requestForm.requester_fax.$error.required && ( vm.formSubmitted || requestForm.requester_fax.$touched)"
-                                                   class="help-block">Request name is required.</p>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <p class="input-group">
+                                            <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="vm.due_date" is-open="popup1.opened" datepicker-options="dateOptions"  close-text="Close" alt-input-formats="altInputFormats" placeholder="YYYY-MM-DD"/>
+                                            <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+                                      </span>
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group"
-                                             ng-class="{ 'has-error': requestForm.scope.$invalid && ( vm.formSubmitted || requestForm.scope.$touched) }">
-                                            <div class="col-sm-12">
-                                                <input type="text" class="form-control" ng-model="vm.scope" name="scope"
-                                                       placeholder="Scope" required>
-                                                <p ng-show="requestForm.scope.$error.required && ( vm.formSubmitted || requestForm.scope.$touched)"
-                                                   class="help-block">Scope is required.</p>
-                                            </div>
+                                <div class="row margin-bottom-40">
+                                    <div class="col-md-6 col-sm-6 col-xs-12" ng-show="bidTemplateNgShow">
+                                        <div class="form-group" ng-class="{ 'has-error': viewBidAddBidForm.bid_template_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.bid_template_id.$touched) }">
+                                            <select class="form-control" name="bid_template_id"  ng-model="vm.bid_template_id"  id="bid_template_id" ng-required="isStandard" >
+                                                <option value="">Select Bid Template</option>
+                                                <option value="{{bidtemplate.id}}" ng-repeat="bidtemplate in vm.systemBidTemplates">
+                                                    {{bidtemplate.name}}
+                                                </option>
+                                            </select>
+                                            <p ng-show="viewBidAddBidForm.bid_template_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.bid_template_id.$touched)"
+                                               class="help-block">Bid template is required.
+                                            </p>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
                                         <div class="form-group">
-                                            <div class="col-sm-12">
-                                                <textarea rows="5" ng-model="vm.details" class="form-control"
-                                                          placeholder="Details">Details</textarea>
-                                            </div>
+                                            <label>Archive Bid </label>
+                                            <input type="checkbox" name="archive_bid" value="1" ng-model="vm.archive_bid" style="margin-left: 10px; margin-top: 10px;">
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4 col-sm-4">
-                                        <div class="form-group"
-                                             ng-class="{ 'has-error': requestForm.source_id.$invalid && ( vm.formSubmitted || requestForm.source_id.$touched) }">
-                                            <div class="col-md-12">
-                                                <select class="form-control" name="source_id" required
-                                                        ng-model="vm.source_id">
-                                                    <option value="">Select Source</option>
-                                                    <option value="{{source.id}}"
-                                                            ng-repeat="source in vm.systemSources">{{source.name}}
-                                                    </option>
-                                                </select>
-                                                <p ng-show="requestForm.source_id.$error.required && ( vm.formSubmitted || requestForm.source_id.$touched)"
-                                                   class="help-block">Source is required.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <div class="form-group"
-                                             ng-class="{ 'has-error': requestForm.bid_statuses_id.$invalid && ( vm.formSubmitted || requestForm.bid_statuses_id.$touched) }">
-                                            <div class="col-md-12">
-                                                <select class="form-control" name="bid_statuses_id" required
-                                                        ng-model="vm.bid_statuses_id">
-                                                    <option value="">Select Status</option>
-                                                    <option value="{{bidstatus.id}}"
-                                                            ng-repeat="bidstatus in vm.systemBidStatus">
-                                                        {{bidstatus.name}}
-                                                    </option>
-                                                </select>
-                                                <p ng-show="requestForm.bid_statuses_id.$error.required && ( vm.formSubmitted || requestForm.bid_statuses_id.$touched)"
-                                                   class="help-block">Bid status is required.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <div class="form-group"
-                                             ng-class="{ 'has-error': requestForm.estimator_id.$invalid && ( vm.formSubmitted || requestForm.estimator_id.$touched) }">
-                                            <div class="col-md-12">
-                                                <select class="form-control" name="estimator_id" required
-                                                        ng-model="vm.estimator_id">
-                                                    <option value="">Select Estimator</option>
-                                                    <option value="{{estimator.id}}"
-                                                            ng-repeat="estimator in vm.systemEstimators">
-                                                        {{estimator.name}}
-                                                    </option>
-                                                </select>
-                                                <p ng-show="requestForm.estimator_id.$error.required && ( vm.formSubmitted || requestForm.estimator_id.$touched)"
-                                                   class="help-block">Estimator is required.
-                                                </p>
-                                            </div>
-                                        </div>
+                                <div class="row margin-bottom-40">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <a href="javascript:void(0)" class="btn btn-primary margin-bottom-40">View Bid Form</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary margin-bottom-40">Approve Bid</a>
+                                        <input type="submit" name="archive_bid" value="Update Bid" class="btn btn-primary margin-bottom-40">
                                     </div>
                                 </div>
-                                <div class="row">
+                            </div>
+                            <div class="col-md-6 col-sm-6 margin-bottom-20">
+                                <div class="row margin-bottom-50">
                                     <div class="col-md-12">
-                                        <button type="submit" class="btn btn-primary">Save</button>
-                                        <a ui-sref="app.requests" class="btn  btn-danger">Cancel</a>
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': viewBidAddBidForm.source_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.source_id.$touched) }">
+                                            <input class="input-text" id="bid_scope" name="scope" type="text" ng-model="vm.scope" required>
+                                            <label for="bid_scope" class="label-helper">Scope</label>
+                                            <p ng-show="viewBidAddBidForm.scope.$error.required && ( vm.formSubmitted || viewBidAddBidForm.scope.$touched)"
+                                               class="help-block">Scope is required.
+                                            </p>
+                                        </div>
+                                        <div class="form-group form-group-change">
+                                            <textarea class="input-text" id="bid_details" name="details" type="text" rows="5" ng-model="vm.details"></textarea>
+                                            <label for="bid_details" class="label-helper">Details</label>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <div class="form-group form-group-change" ng-class="{ 'has-error': viewBidAddBidForm.source_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.source_id.$touched) }">
+                                                    <select class="input-text input-text-select" name="source_id" required  ng-model="vm.source_id" id="bid_source" >
+                                                        <option value="">Select Source</option>
+                                                        <option value="{{source.id}}"
+                                                                ng-repeat="source in vm.systemSources">{{source.name}}
+                                                        </option>
+                                                    </select>
+                                                    <label for="bid_source" class="label-helper">Source</label>
+                                                    <p ng-show="viewBidAddBidForm.source_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.source_id.$touched)"
+                                                       class="help-block">Source is required.
+                                                    </p>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <div class="form-group form-group-change"
+                                                     ng-class="{ 'has-error': viewBidAddBidForm.bid_statuses_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.bid_statuses_id.$touched) }">
+                                                    <div class="col-md-12">
+                                                        <select class="input-text input-text-select" name="bid_statuses_id" required ng-model="vm.bid_statuses_id" id="bid_status">
+                                                            <option value="">Select Status</option>
+                                                            <option value="{{bidstatus.id}}"
+                                                                    ng-repeat="bidstatus in vm.systemBidStatus">
+                                                                {{bidstatus.name}}
+                                                            </option>
+                                                        </select>
+                                                        <label for="bid_status" class="label-helper">Status</label>
+                                                        <p ng-show="viewBidAddBidForm.bid_statuses_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.bid_statuses_id.$touched)"
+                                                           class="help-block">Bid status is required.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-sm-4 col-xs-12 ">
+                                                <div class="form-group form-group-change"  ng-class="{ 'has-error': viewBidAddBidForm.estimator_id.$invalid && ( vm.formSubmitted || viewBidAddBidForm.estimator_id.$touched) }">
+                                                    <select class="input-text input-text-select" name="estimator_id" required
+                                                            ng-model="vm.estimator_id" id="bid_estimator">
+                                                        <option value="">Select Estimator</option>
+                                                        <option value="{{estimator.id}}"
+                                                                ng-repeat="estimator in vm.systemEstimators">
+                                                            {{estimator.name}}
+                                                        </option>
+                                                    </select>
+                                                    <label for="bid_estimator" class="label-helper">Estimator</label>
+                                                    <p ng-show="viewBidAddBidForm.estimator_id.$error.required && ( vm.formSubmitted || viewBidAddBidForm.estimator_id.$touched)"
+                                                       class="help-block">Estimator is required.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
-                        <div class="col-md-6 col-sm-12 col-xs-12 content-tab" style="margin-bottom: 50px">
-                            <div class="form-group form-group-change">
-                                <input class="input-text" required="required" id="property_name" name="property_name" type="text" ng-model="property_name">
-                                <label for="property_name" class="label-helper">Property Name</label>
                             </div>
-                            <div class="form-group form-group-change">
-                                <input class="input-text" id="property_street" name="property_street" type="text" ng-model="property_street">
-                                <label for="property_street" class="label-helper">Street Address</label>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
-                                        <input class="input-text" id="property_city" name="property_city" type="text" ng-model="property_city">
-                                        <label for="property_city" class="label-helper label-helper-change">City</label>
-                                    </div>
-                                    <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
-                                        <input class="input-text" id="property_state" name="property_state" type="text" ng-model="property_state">
-                                        <label for="property_state" class="label-helper label-helper-change">State</label>
-                                    </div>
-                                    <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
-                                        <input class="input-text" id="property_zip" name="property_zip" type="text" ng-model="property_zip">
-                                        <label for="property_zip" class="label-helper label-helper-change">Zip</label>
+                        </form>
+                    </div>
+
+                    <div class="row">
+                        <!--left Side Start --->
+                        <div class="col-md-6">
+                            <div class="row" style="margin-bottom: 30px; margin-top:30px">
+                                <div class="col-md-12">
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col-md-6 col-sm-6">
+                                            <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Comments</span>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 text-right">
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidAddComment()">Add Comment</a>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidEditComment()">Edit Comment</a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
-                                        <input class="input-text" id="property_phone" name="property_phone" type="text" ng-model="property_phone">
-                                        <label for="property_phone" class="label-helper label-helper-change">Property Phone</label>
-                                    </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
-                                        <input class="input-text" id="property_fax" name="property_fax" type="text" ng-model="property_fax">
-                                        <label for="property_fax" class="label-helper label-helper-change">Property Fax</label>
-                                    </div>
+                                <div class="col-md-12" style="margin-bottom: 20px"  ng-show="request_comment_form_show">
+                                    <form name="requestCommentAddForm" ng-submit="vm.requestCommentSave(requestCommentAddForm.$valid, requestCommentAddForm)" novalidate>
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': requestCommentAddForm.comment.$invalid && ( mvm.formSubmitted || requestCommentAddForm.comment.$touched) }">
+                                            <textarea class="input-text input-text-select" required="required" id="request_comment" rows="5" name="comment" cols="50" ng-model="vm.comment.comment"></textarea>
+                                            <label for="request_comment" class="label-helper">Comment</label>
+                                            <p ng-show="requestCommentAddForm.comment.$error.required && ( mvm.formSubmitted || requestCommentAddForm.comment.$touched)" class="help-block">Comment is required.</p>
+                                        </div>
+                                        <div class="form-group text-right">
+                                            <button class="btn btn-default" type="submit">Comment Save/Edit</button>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickRequestCommentCancel()">Cancel</a>
+                                        </div>
+                                    </form>
                                 </div>
-                            </div>
-                            <div class="form-group form-group-change">
-                                <input class="input-text"  id="contact" name="contact" type="text" ng-model="contact">
-                                <label for="contact" class="label-helper">Contact</label>
+                                <div class="col-md-12">
+                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable10" dt-options="vm.dtOptions10" dt-columns="vm.dtColumns10"></table>
+                                </div>
+
                             </div>
 
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
-                                        <input class="input-text" id="contact_phone" name="contact_phone" type="text" ng-model="contact_phone">
-                                        <label for="contact_phone" class="label-helper label-helper-change">Contact Phone</label>
+                            <!-- line item start--->
+                            <div class="row" style="margin-bottom: 30px; margin-top:30px" ng-show="showStandardLineItem">
+                                <div class="col-md-12">
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col-md-6 col-sm-6">
+                                            <span class="font-weight-900" style="font-size: 15px; font-weight:900;">Bid Line Items</span>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 text-right">
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidAddLineItem()">Add Line Item</a>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidEditLineItem()">Edit Line Item</a>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
-                                        <input class="input-text" id="contact_fax" name="contact_fax" type="text" ng-model="contact_fax">
-                                        <label for="contact_fax" class="label-helper label-helper-change">Contact Fax</label>
+                                </div>
+                                <div class="col-md-12 margin-bottom-30" ng-show="bid_line_item_form_show">
+                                    <form name="BidLineAddForm" ng-submit="vm.bidLineSave(BidLineAddForm.$valid, BidLineAddForm)" novalidate>
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': BidLineAddForm.line_item_description.$invalid && ( mvm.formSubmitted || BidLineAddForm.line_item_description.$touched) }">
+                                            <input class="input-text input-text-select" required ng-model="vm.line_items.line_item_description" id="bid_line_items_description" name="line_item_description">
+                                            <label for="request_comment" class="label-helper">Line Item Description</label>
+                                            <p ng-show="BidLineAddForm.line_item_description.$error.required && ( mvm.formSubmitted || BidLineAddForm.line_item_description.$touched)" class="help-block">Line item description is required.</p>
+                                        </div>
+                                        <div class="form-group form-group-change" ng-class="{ 'has-error': BidLineAddForm.lump_sum.$invalid && ( mvm.formSubmitted || BidLineAddForm.lump_sum.$touched) }">
+                                            <input class="input-text input-text-select" required ng-model="vm.line_items.lump_sum" id="bid_lump_sum" name="lump_sum">
+                                            <label for="bid_lump_sum" class="label-helper">Lump Sum</label>
+                                            <p ng-show="BidLineAddForm.line_item_description.$error.required && ( mvm.formSubmitted || BidLineAddForm.line_item_description.$touched)" class="help-block">Lump sum is required.</p>
+                                        </div>
+                                        <div class="form-group text-right">
+                                            <button class="btn btn-default" type="submit">Line Item Save/Edit</button>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidLineItemCancel()">Cancel</a>
+                                        </div>
+                                    </form>
+
+                                </div>
+                                <div class="col-md-12 margin-bottom-40">
+                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable11" dt-options="vm.dtOptions11" dt-columns="vm.dtColumns11"></table>
+                                </div>
+                            </div>
+                            <!-- line item end--->
+
+                            <!-- Request File Start -->
+                            <div class="row" style="margin-bottom: 30px; margin-top:30px" ng-hide="showStandardLineItem">
+                                <div class="col-md-12">
+                                    <div class="row margin-bottom-10">
+                                        <div class="col-md-6 col-sm-6 col-xs-12 margin-bottom-20">
+                                            <span class="font-weight-900" >Files</span>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 col-xs-12 text-right margin-bottom-20">
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidAddFile()">Add File</a>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidEditFile()">Edit File</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 margin-bottom-30" ng-show="bid_file_form_show">
+                                    <form name="BidFileAddForm" ng-submit="vm.bidFileSave(BidFileAddForm.$valid, BidFileAddForm)" novalidat >
+                                        <div class="form-group form-group-change"
+                                             ng-class="{ 'has-error': BidFileAddForm.file_type_id.$invalid && ( vm.formSubmitted || BidFileAddForm.file_type_id.$touched) }">
+                                            <select class="input-text input-text-select" name="file_type_id" required ng-model="vm.file.file_type_id" id="bid_file_type_id">
+                                                <option value="">Select File type</option>
+                                                <option value="{{filetype.id}}"
+                                                        ng-repeat="filetype in vm.systemFileTypes">
+                                                    {{filetype.name}}
+                                                </option>
+                                            </select>
+                                            <label for="bid_file_type_id" class="label-helper">File Type</label>
+                                            <p ng-show="BidFileAddForm.file_type_id.$error.required && ( vm.formSubmitted || BidFileAddForm.file_type_id.$touched)"
+                                               class="help-block">File type is required.
+                                            </p>
+                                        </div>
+                                        <div class="form-group form-group-change">
+                                            <textarea class="input-text input-text-select"  id="file_description" rows="5" name="description" cols="50" ng-model="vm.file.description"></textarea>
+                                            <label for="file_description" class="label-helper">Description</label>
+                                        </div>
+                                        <div class="form-group form-group-change"
+                                             ng-class="{ 'has-error': BidFileAddForm.file_name.$invalid && ( vm.formSubmitted || BidFileAddForm.file_name.$touched) }">
+                                            <input type="file" name="file" file-model="vm.file.file_name" id="bid_file_name" class="input-text input-text-select" ng-required="!bid_file_show">
+                                            <label for="bid_file_name" class="label-helper">File</label>
+                                            <p ng-show="viewBidAddBidForm.file_name.$error.required && ( vm.formSubmitted || viewBidAddBidForm.file_name.$touched)"
+                                               class="help-block">File is required.
+                                            </p>
+                                        </div>
+                                        <div class="form-group" ng-show="bid_file_show">
+                                            <p>Do you want to change previous uploaded file ? File name is {{show_file_name}} . If you want, Please upload new file. <a href="/upload-file/{{download_file_name}}" download = {{show_file_name}}>Download </a></p>
+                                        </div>
+                                        <div class="form-group text-right">
+                                            <button class="btn btn-default" type="submit">File Save/Edit</button>
+                                            <a href="javascript:void(0)" class="btn btn-default" ng-click="onClickBidFileCancel()">Cancel</a>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-12 margin-bottom-40">
+                                    <table datatable="" width="100%" class="table table-striped table-bordered" ng-if="vm.displayTable12" dt-options="vm.dtOptions12" dt-columns="vm.dtColumns12"></table>
+                                </div>
+                            </div>
+                            <!-- Request File End -->
+
+                        </div>
+                        <!--left Side End --->
+                        <!--Right Side Start --->
+                        <div class="col-md-6">
+
+                            <!--Assign Property Start-->
+                            <div class="row margin-bottom-30">
+                                <div class="col-md-12">
+                                    <div class="form-group text-right">
+                                        <button type="button" class="btn btn-primary text-right" ng-click="vm.modalOpen('lg')">
+                                            Assign Property
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group form-group-change">
-                                <input class="input-text"  id="assign_property_management_company" name="management_company" type="text" ng-model="management_company">
-                                <label for="assign_property_management_company" class="label-helper">Management Company</label>
-                            </div>
-                            <div class="form-group form-group-change">
-                                <input class="input-text" id="assign_property_management_company_street" name="management_company_street" type="text" ng-model="management_company_street">
-                                <label for="assign_property_management_company_street" class="label-helper">Street Address</label>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
-                                        <input class="input-text" id="assign_property_management_company_city" name="management_company_city" type="text" ng-model="management_company_city">
-                                        <label for="assign_property_management_company_city" class="label-helper label-helper-change">City</label>
+                            <div class="row margin-bottom-40">
+                                <div class="col-md-12">
+                                    <div class="form-group form-group-change">
+                                        <input class="input-text" required="required" id="property_name" name="property_name" type="text" ng-model="property_name">
+                                        <label for="property_name" class="label-helper">Property Name</label>
                                     </div>
-                                    <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
-                                        <input class="input-text" id="assign_property_management_company_state" name="management_company_state" type="text" ng-model="management_company_state">
-                                        <label for="assign_property_management_company_state" class="label-helper label-helper-change">State</label>
+                                    <div class="form-group form-group-change">
+                                        <input class="input-text" id="property_street" name="property_street" type="text" ng-model="property_street">
+                                        <label for="property_street" class="label-helper">Street Address</label>
                                     </div>
-                                    <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
-                                        <input class="input-text" id="assign_property_management_company_zip" name="management_company_zip" type="text" ng-model="management_company_zip">
-                                        <label for="assign_property_management_company_zip" class="label-helper label-helper-change">Zip</label>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                                <input class="input-text" id="property_city" name="property_city" type="text" ng-model="property_city">
+                                                <label for="property_city" class="label-helper label-helper-change">City</label>
+                                            </div>
+                                            <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                                <input class="input-text" id="property_state" name="property_state" type="text" ng-model="property_state">
+                                                <label for="property_state" class="label-helper label-helper-change">State</label>
+                                            </div>
+                                            <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                                <input class="input-text" id="property_zip" name="property_zip" type="text" ng-model="property_zip">
+                                                <label for="property_zip" class="label-helper label-helper-change">Zip</label>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
-                                        <input class="input-text" id="management_company_phone" name="management_company_phone" type="text"  ng-model="management_company_phone">
-                                        <label for="management_company_phone" class="label-helper label-helper-change">Management Phone</label>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                                <input class="input-text" id="property_phone" name="property_phone" type="text" ng-model="property_phone">
+                                                <label for="property_phone" class="label-helper label-helper-change">Property Phone</label>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                                <input class="input-text" id="property_fax" name="property_fax" type="text" ng-model="property_fax">
+                                                <label for="property_fax" class="label-helper label-helper-change">Property Fax</label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
-                                        <input class="input-text" id="management_company_fax" name="management_company_fax" type="text" ng-model="management_company_fax">
-                                        <label for="management_company_fax" class="label-helper label-helper-change">Management Fax</label>
+                                    <div class="form-group form-group-change">
+                                        <input class="input-text"  id="contact" name="contact" type="text" ng-model="contact">
+                                        <label for="contact" class="label-helper">Contact</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                                <input class="input-text" id="contact_phone" name="contact_phone" type="text" ng-model="contact_phone">
+                                                <label for="contact_phone" class="label-helper label-helper-change">Contact Phone</label>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                                <input class="input-text" id="contact_fax" name="contact_fax" type="text" ng-model="contact_fax">
+                                                <label for="contact_fax" class="label-helper label-helper-change">Contact Fax</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-change">
+                                        <input class="input-text"  id="assign_property_management_company" name="management_company" type="text" ng-model="management_company">
+                                        <label for="assign_property_management_company" class="label-helper">Management Company</label>
+                                    </div>
+                                    <div class="form-group form-group-change">
+                                        <input class="input-text" id="assign_property_management_company_street" name="management_company_street" type="text" ng-model="management_company_street">
+                                        <label for="assign_property_management_company_street" class="label-helper">Street Address</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                                <input class="input-text" id="assign_property_management_company_city" name="management_company_city" type="text" ng-model="management_company_city">
+                                                <label for="assign_property_management_company_city" class="label-helper label-helper-change">City</label>
+                                            </div>
+                                            <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                                <input class="input-text" id="assign_property_management_company_state" name="management_company_state" type="text" ng-model="management_company_state">
+                                                <label for="assign_property_management_company_state" class="label-helper label-helper-change">State</label>
+                                            </div>
+                                            <div class="col-md-3 col-sm-3 col-xs-12 form-group-change">
+                                                <input class="input-text" id="assign_property_management_company_zip" name="management_company_zip" type="text" ng-model="management_company_zip">
+                                                <label for="assign_property_management_company_zip" class="label-helper label-helper-change">Zip</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                                <input class="input-text" id="management_company_phone" name="management_company_phone" type="text"  ng-model="management_company_phone">
+                                                <label for="management_company_phone" class="label-helper label-helper-change">Management Phone</label>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group-change">
+                                                <input class="input-text" id="management_company_fax" name="management_company_fax" type="text" ng-model="management_company_fax">
+                                                <label for="management_company_fax" class="label-helper label-helper-change">Management Fax</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <!--Right Side End --->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+
+<!-- property Assign part --->
 <script type="text/ng-template" id="myModalContent.html">
     <div class="modal-header">
         <h3 class="modal-title">Assign Property</h3>
@@ -547,9 +702,9 @@
                                         <input id="area_code" type="text" ng-model="mvm.new.phone.area_code"
                                                class="input-text" name="area_code" required>
                                         <label for="area_code" class="label-helper">Area Code</label>
-                                            <p ng-show="propertyPhoneAddForm.area_code.$error.required && ( mvm.formSubmitted || propertyPhoneAddForm.area_code.$touched)"
-                                               class="help-block">Property name is required.
-                                            </p>
+                                        <p ng-show="propertyPhoneAddForm.area_code.$error.required && ( mvm.formSubmitted || propertyPhoneAddForm.area_code.$touched)"
+                                           class="help-block">Property name is required.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -909,3 +1064,4 @@
         <button class="btn btn-warning" type="button" ng-click="mvm.cancel()">Cancel</button>
     </div>
 </script>
+

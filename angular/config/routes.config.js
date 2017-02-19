@@ -127,7 +127,7 @@ export function RoutesConfig($stateProvider, $urlRouterProvider) {
             }
         })
         .state('app.bidsadd', {
-            url: '/bid-add',
+            url: '/bid-add/:requestId',
             data: {
                 auth: true
             },
@@ -137,7 +137,23 @@ export function RoutesConfig($stateProvider, $urlRouterProvider) {
                 }
             },
             params: {
-                alerts: null
+                alerts: null,
+                requestId:null
+            }
+        })
+        .state('app.bidsedit', {
+            url: '/bid-edit/:bidId',
+            data: {
+                auth: true
+            },
+            views: {
+                'main@app': {
+                    template: '<bid-edit></bid-edit>'
+                }
+            },
+            params: {
+                alerts: null,
+                bidId:null
             }
         })
         .state('app.uitimeline', {

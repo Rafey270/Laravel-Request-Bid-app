@@ -20,11 +20,11 @@ use App\Property_contact;
 
 use App\Property_comment;
 
-use App\Property_management_company;
+use App\Management_company;
 
-use App\Property_management_company_contact;
+use App\Management_company_contact;
 
-use App\Property_management_company_phone;
+use App\Management_company_phone;
 
 use App\Property_phone;
 
@@ -34,8 +34,20 @@ use App\Request_comment;
 
 use App\Request_file;
 
+use App\Phone;
+
+use App\Request_bid_job;
+
 class RequestController extends Controller
 {
+    public function postRequestbid(Request $request){
+        $request_id = $request->input('request_id');
+        $requestModel = RequestModel::where('id', $request_id)->first();
+        $requestBidJob = Request_bid_job::where('name','Bid')->first();
+        $requestModel->request_bid_job_id = $requestBidJob->id;
+        $requestModel->save();
+        return response()->json(['response' =>$requestModel]);
+    }
     public function postRequest(Request $request){
         $request_id = $request->input('request_id');
         if($request_id !=""){
@@ -45,10 +57,14 @@ class RequestController extends Controller
             $requestModel->save();
         }else{
             $requestModel = RequestModel::create($request->all());
+            $requestBidJob = Request_bid_job::where('name','Request')->first();
             $requestModel->assign_date = Carbon::today()->format('Y-m-d');
             $requestModel->creator_id = Auth::user()->id;
             $requestModel->assign_id = Auth::user()->id;
             $requestModel->editor_id = Auth::user()->id;
+            $requestModel->approved_id = Auth::user()->id;
+            $requestModel->request_bid_job_id = $requestBidJob->id;
+
             $requestModel->save();
         }
         $data['result'] = 'success';
@@ -56,7 +72,9 @@ class RequestController extends Controller
     }
 
     public function getIndex(){
-        $requestLists = RequestModel::all();
+        $requestBidJob = Request_bid_job::where('name','Request')->first();
+        $requestLists = RequestModel::where('request_bid_job_id', $requestBidJob->id)->get();
+
         $requestListArray = array();
         if(count($requestLists)>0){
             foreach ($requestLists as $key_request => $requestList){
@@ -82,62 +100,98 @@ class RequestController extends Controller
         $requestModel = RequestModel::where('id', $requestId)->first();
         $phone_fax_type = Phone_type::where('name','Fax')->first();
         $resultArray = array();
+        $resultProperties = array();
         if($requestModel->property_id != 0){
             $resultArray['property'] = Property::where('id', $requestModel->property_id)->first();
+            $property = Property::where('id', $requestModel->property_id)->first();
+            $resultProperties['property_id'] = $requestModel->property_id;
+            $propertyPhones = Property_phone::where('property_id' , $requestModel->property_id)->get();
+            if(count($propertyPhones)>0){
+                $property_phone = Property_phone::where('property_id',$requestModel->property_id)->first();
+                $resultProperties['property_phone_id'] = $property_phone->id;
+                $phone = Phone::where('id', $property_phone->phone_id)->first();
+                if($phone->phone_type_id  == $phone_fax_type->id){
+                    $resultArray['phone'] = "";
+                    $resultArray['phone_fax'] = $phone->area_code. " " . $phone->phone_number ." " . $phone->phone_ext;
+                }else{
+                    $resultArray['phone'] = $phone->area_code. " " . $phone->phone_number ." " . $phone->phone_ext;
+                    $resultArray['phone_fax'] = "";
+                }
+            }else{
+                $resultArray['phone'] = "";
+                $resultArray['phone_fax'] ="";
+                $resultProperties['proerty_id'] = "";
+            }
+            $propertyContacts = Property_contact::where('property_id',$requestModel->property_id)->get();
+            if(count($propertyContacts)>0) {
+                $property_contact = Property_contact::where('property_id',$requestModel->property_id)->first();
+                $resultProperties['property_contact_id'] = $property_contact->id;
+                $resultArray['contact_name'] = $property_contact->first_name." " . $property_contact->last_name;
+            }else{
+                $resultArray['contact_name'] =  "";
+                $resultProperties['property_contact_id'] = "";
+            }
+            if($property->management_company_id != 0){
+                $property_company = Management_company::where('id',$property->management_company_id)->first();
+                $resultArray['property_company_list'] = $property_company;
+                $resultProperties['property_company_id'] = $property_company->id;
+            }else{
+                $resultArray['property_company_list'] = "";
+                $resultProperties['property_company_id'] = "";
+            }
+            if($property->management_company_id != 0) {
+                $managementCompanyPhones = Management_company_phone::where('management_company_id',$property->management_company_id)->get();
+                if (count($managementCompanyPhones)>0) {
+                    $property_company_phone = Management_company_phone::where('management_company_id',$property->management_company_id)->first();
+                    $phone = Phone::where('id', $property_company_phone->phone_id)->first();
+                    $resultProperties['property_company_phone_id'] = $property_company_phone->id;
+                    if ($phone->phone_type_id == $phone_fax_type->id) {
+                        $resultArray['company_phone'] = "";
+                        $resultArray['company_phone_fax'] = $phone->area_code . " " . $phone->phone_number . " " . $phone->phone_ext;
+                    } else {
+                        $resultArray['company_phone'] = $phone->area_code . " " . $phone->phone_number . " " . $phone->phone_ext;
+                        $resultArray['company_phone_fax'] = "";
+                    }
+                } else {
+                    $resultArray['company_phone'] = "";
+                    $resultArray['company_phone_fax'] = "";
+                    $resultProperties['property_company_phone_id'] = "";
+                }
+            }else{
+                $resultArray['company_phone'] = "";
+                $resultArray['company_phone_fax'] = "";
+                $resultProperties['property_company_phone_id'] = "";
+            }
+            if($property->management_company_id != 0) {
+                $managementCompanyContacts = Management_company_contact::where('management_company_id', $property->management_company_id)->get();
+                if (count($managementCompanyContacts)>0) {
+
+                    $property_company_contact = Management_company_contact::where('management_company_id', $property->management_company_id)->first();
+                    $resultProperties['property_company_contact_id'] = $property_company_contact->id;
+                    $resultArray['company_contact_name'] = $property_company_contact->first_name . " " . $property_company_contact->last_name;
+                } else {
+                    $resultArray['company_contact_name'] = "";
+                    $resultProperties['property_company_contact_id'] = "";
+                }
+            }else{
+                $resultArray['company_contact_name'] = "";
+                $resultProperties['property_company_contact_id'] = "";
+            }
         }else{
             $resultArray['property'] = "";
-        }
-        if($requestModel->property_phone_id !=0){
-            $property_phone = Property_phone::where('id',$requestModel->property_phone_id)->first();
-            if($property_phone->phone_type_id  == $phone_fax_type->id){
-                $resultArray['phone'] = "";
-                $resultArray['phone_fax'] = $property_phone->area_code. " " . $property_phone->phone_number ." " . $property_phone->phone_ext;
-            }else{
-                $resultArray['phone'] = $property_phone->area_code. " " . $property_phone->phone_number ." " . $property_phone->phone_ext;
-                $resultArray['phone_fax'] = "";
-            }
-        }else{
             $resultArray['phone'] = "";
             $resultArray['phone_fax'] ="";
-        }
-
-        if($requestModel->property_contact_id != "") {
-            $property_contact = Property_contact::where('id',$requestModel->property_contact_id)->first();
-            $resultArray['contact_name'] = $property_contact->first_name." " . $property_contact->last_name;
-        }else{
             $resultArray['contact_name'] =  "";
-        }
-
-
-        if($requestModel->property_company_id != "") {
-            $property_company = Property_management_company::where('id',$requestModel->property_company_id)->first();
-            $resultArray['property_company_list'] = $property_company;
-        }else{
-            $resultArray['property_company_list'] = "";
-        }
-        if($requestModel->property_company_phone_id != "") {
-            $property_company_phone = Property_management_company_phone::where('id',$requestModel->property_company_phone_id)->first();
-            if($property_company_phone->phone_type_id  == $phone_fax_type->id){
-                $resultArray['company_phone'] = "";
-                $resultArray['company_phone_fax'] =$property_company_phone->area_code. " " . $property_company_phone->phone_number ." " . $property_company_phone->phone_ext;
-            }else{
-                $resultArray['company_phone'] = $property_company_phone->area_code. " " . $property_company_phone->phone_number ." " . $property_company_phone->phone_ext;
-                $resultArray['company_phone_fax'] ="";
-            }
-        }else{
             $resultArray['company_phone'] = "";
             $resultArray['company_phone_fax'] ="";
-        }
-        if($requestModel->property_company_contact_id !="") {
-            $property_company_contact = Property_management_company_contact::where('id',$requestModel->property_company_phone_id)->first();
-            $resultArray['company_contact_name'] = $property_company_contact->first_name." " . $property_company_contact->last_name;
-        }else{
             $resultArray['company_contact_name'] = "";
+            $resultArray['property_company_list'] = "";
         }
+
 
         $comments = Request_comment::where('request_id', $requestId)->get();
         $commentArray = $this->getRequestCommentList($comments);
-        return response()->json(['response' =>$resultArray, 'request' =>$requestModel, 'comment' =>$commentArray]);
+        return response()->json(['response' =>$resultArray, 'request' =>$requestModel, 'comment' =>$commentArray,'property_list' =>$resultProperties]);
     }
 
 
